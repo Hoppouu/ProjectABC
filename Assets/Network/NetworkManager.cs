@@ -4,21 +4,21 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using Network;
+using Google.Protobuf;
 
 public class NetworkManager : MonoBehaviour, IDisposable
 {
-    private const int PORT = 19826;
+    public bool IsHost { get; private set; }
 
-    //네트워크 단편화 피하기 위해 1400 바이트 이하로 유지.
-    private const int BUFFER_SIZE = 1024;
+    private const int PORT = 19826;
+    private const int BUFFER_SIZE = 1024;   //MTU사이즈가 1500 까지 이므로 1024. 
 
     private UdpClient _udpClient;
     private CancellationTokenSource _cts;
-
-    public bool IsHost { get; private set; }
-
     private IPEndPoint _hostEndPoint;
     private PacketHandler _packetHandler;
+    private uint _seq = 0;
 
     private void Awake()
     {
@@ -39,7 +39,6 @@ public class NetworkManager : MonoBehaviour, IDisposable
             _udpClient = new UdpClient(0);
             _hostEndPoint = new IPEndPoint(IPAddress.Parse(hostIP), PORT);
             Log.Info($"Client started on port {_udpClient.Client.LocalEndPoint}", this);
-
             Task.Run(() => ReceiveLoop(_cts.Token));
         }
         catch (Exception ex)
@@ -157,6 +156,22 @@ public class NetworkManager : MonoBehaviour, IDisposable
             _udpClient = null;
             Log.Info("disposion complete.", this);
         }
+    }
+
+
+    private void SendPacket<T>(PacketType type, T message) where T : IMessage<T>
+    {
+        byte[] data = message.ToByteArray();
+
+        NetworkPacket packet = new NetworkPacket
+        {
+            Type = type,
+            Sequence = _seq++,
+            Data = ByteString.CopyFrom(data)
+        };
+
+        byte[] sendBytes = packet.ToByteArray();
+        _udpClient.Send(sendBytes, sendBytes.Length, _hostEndPoint);
     }
 
     private NetworkPacket ParseBytesToPacket(byte[] data)

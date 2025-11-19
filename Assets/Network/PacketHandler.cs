@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Net;
-
+using Network;
 public class PacketHandler
 {
     public delegate void  PacketProcessor(NetworkPacket packet);
@@ -12,9 +10,9 @@ public class PacketHandler
     public PacketHandler()
     {
         _handlerMap = new Dictionary<PacketType, Action<NetworkPacket>>();
-        RegisterHandler(PacketType.H2C_MOVE_SYNC, HandleMoveSync);
-        RegisterHandler(PacketType.H2C_INTERACT_RES, HandleInteractionResult);
-        RegisterHandler(PacketType.H2C_GAME_STATE, HandleGameStateChange);
+        RegisterHandler(PacketType.H2CMoveSync, HandleMoveSync);
+        RegisterHandler(PacketType.H2CInteractRes, HandleInteractionResult);
+        RegisterHandler(PacketType.H2CGameState, HandleGameStateChange);
     }
 
     public void RoutePacket(NetworkPacket packet, IPEndPoint sender)
@@ -60,42 +58,3 @@ public class PacketHandler
         // Console.WriteLine($"[Reliable] Game State changed.");
     }
 }
-
-/// <summary>
-/// 네트워크 패킷 타입
-/// </summary>
-public enum PacketType : byte
-{
-    /// <summary>
-    /// Transform 정보 전달
-    /// </summary>
-    C2H_MOVE = 1,
-
-    /// <summary>
-    /// 모든 플레이어 Transform 정보 동기화
-    /// </summary>
-    H2C_MOVE_SYNC = 2,
-
-    /// <summary>
-    /// 상호작용 시도 요청
-    /// </summary>
-    C2H_INTERACT_REQ = 16,
-
-    /// <summary>
-    /// 상호작용 처리 결과
-    /// </summary>
-    H2C_INTERACT_RES = 17,
-
-    /// <summary>
-    /// 게임 상태 변경
-    /// </summary>
-    H2C_GAME_STATE = 18
-}
-
-public class NetworkPacket
-{
-    public PacketType Type { get; set; }
-    public byte[] Data { get; set; }
-    public ushort Sequence { get; set; }
-}
-
