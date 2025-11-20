@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Network;
 using Google.Protobuf;
+using System.IO;
+using UnityEngine.LightTransport;
 
 public class NetworkManager : MonoBehaviour, IDisposable
 {
@@ -18,7 +20,7 @@ public class NetworkManager : MonoBehaviour, IDisposable
     private CancellationTokenSource _cts;
     private IPEndPoint _hostEndPoint;
     private PacketHandler _packetHandler;
-    private uint _seq = 0;
+    private int _seq = 0;
 
     private void Awake()
     {
@@ -54,7 +56,6 @@ public class NetworkManager : MonoBehaviour, IDisposable
         {
             _udpClient = new UdpClient(PORT);
             Log.Info($"Host started and listening on port {PORT}", this);
-            // 호스트는 자기 자신에게도 접속하는 로직을 추가로 실행해야 함 (StartAsClient(localIp)와 유사)
             Task.Run(() => ReceiveLoop(_cts.Token));
         }
         catch (Exception ex)
@@ -94,7 +95,7 @@ public class NetworkManager : MonoBehaviour, IDisposable
                 //[TODO]: data를 NetworkPacket 객체로 변환!! Sequence Number, PacketType 등을 추출하는 로직 필요!
                 if (data.Length > 0)
                 {
-                    NetworkPacket packet = ParseBytesToPacket(data);
+                    NetworkPacket packet = Deserialize(data);
                     if (packet != null)
                     {
                         _packetHandler.RoutePacket(packet, sender);
@@ -159,27 +160,37 @@ public class NetworkManager : MonoBehaviour, IDisposable
     }
 
 
-    private void SendPacket<T>(PacketType type, T message) where T : IMessage<T>
+    private void Serialize<T>(PacketType type, T message) where T : IMessage<T>
     {
         byte[] data = message.ToByteArray();
 
-        NetworkPacket packet = new NetworkPacket
+        NetworkPacket packet = new NetworkPacket()
         {
             Type = type,
-            Sequence = _seq++,
+            Sequence = GetNextSequence(),
             Data = ByteString.CopyFrom(data)
         };
 
         byte[] sendBytes = packet.ToByteArray();
-        _udpClient.Send(sendBytes, sendBytes.Length, _hostEndPoint);
+        _udpClient.Send(sendBytes, sendBytes.Length);
     }
 
-    private NetworkPacket ParseBytesToPacket(byte[] data)
+    private NetworkPacket Deserialize(byte[] data)
     {
-        //[TODO]
-        //1. 헤더(PacketType)와 Sequence Number를 byte[]에서 추출.
-        //2. 진짜 Data부분 추출
-        //3. 역직렬화 로직 구현 (Protobuf/MessagePack 등)
-        return new NetworkPacket();
+        try
+        {
+            MessageParser<NetworkPacket> parser = NetworkPacket.Parser;
+            return parser.ParseFrom(data);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Protobuf 역직렬화 실패: {ex.Message}");
+            return null;
+        }
+    }
+
+    private int GetNextSequence()
+    {
+        return System.Threading.Interlocked.Increment(ref _seq);
     }
 }
