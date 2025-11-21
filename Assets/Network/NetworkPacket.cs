@@ -24,27 +24,26 @@ namespace Network {
     static NetworkPacketReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChNOZXR3b3JrUGFja2V0LnByb3RvEgdOZXR3b3JrIioKB1ZlY3RvcjMSCQoB",
-            "eBgBIAEoAhIJCgF5GAIgASgCEgkKAXoYAyABKAIiZgoKUGxheWVyTW92ZRIQ",
-            "CghwbGF5ZXJJZBgBIAEoBRIiCghwb3NpdGlvbhgCIAEoCzIQLk5ldHdvcmsu",
-            "VmVjdG9yMxIiCghyb3RhdGlvbhgDIAEoCzIQLk5ldHdvcmsuVmVjdG9yMyJq",
-            "Cg5QbGF5ZXJNb3ZlU3luYxIQCghwbGF5ZXJJZBgBIAEoBRIiCghwb3NpdGlv",
-            "bhgCIAEoCzIQLk5ldHdvcmsuVmVjdG9yMxIiCghyb3RhdGlvbhgDIAEoCzIQ",
-            "Lk5ldHdvcmsuVmVjdG9yMyIzCg5QbGF5ZXJJbnRlcmFjdBIQCghvYmplY3RJ",
-            "ZBgBIAEoBRIPCgdzdWNjZXNzGAIgASgIIjIKDkludGVyYWN0UmVzdWx0EhAK",
-            "CG9iamVjdElkGAEgASgFEg4KBnJlc3VsdBgCIAEoCSIgCg9HYW1lU3RhdGVV",
-            "cGRhdGUSDQoFc3RhdGUYASABKAkiUgoNTmV0d29ya1BhY2tldBIhCgR0eXBl",
-            "GAEgASgOMhMuTmV0d29yay5QYWNrZXRUeXBlEhAKCHNlcXVlbmNlGAIgASgF",
-            "EgwKBGRhdGEYAyABKAwqhgEKClBhY2tldFR5cGUSFwoTUEFDS0VUX1RZUEVf",
-            "VU5LTk9XThAAEgwKCEMySF9NT1ZFEAESEQoNSDJDX01PVkVfU1lOQxACEhQK",
-            "EEMySF9JTlRFUkFDVF9SRVEQEBIUChBIMkNfSU5URVJBQ1RfUkVTEBESEgoO",
-            "SDJDX0dBTUVfU1RBVEUQEmIGcHJvdG8z"));
+            "ChNOZXR3b3JrUGFja2V0LnByb3RvEgdOZXR3b3JrIicKBFZlYzMSCQoBeBgB",
+            "IAEoAhIJCgF5GAIgASgCEgkKAXoYAyABKAIiYAoKUGxheWVyTW92ZRIQCghw",
+            "bGF5ZXJJZBgBIAEoBRIfCghwb3NpdGlvbhgCIAEoCzINLk5ldHdvcmsuVmVj",
+            "MxIfCghyb3RhdGlvbhgDIAEoCzINLk5ldHdvcmsuVmVjMyI8Cg5QbGF5ZXJN",
+            "b3ZlU3luYxIqCg1wbGF5ZXJNb3ZlQXJyGAEgAygLMhMuTmV0d29yay5QbGF5",
+            "ZXJNb3ZlIjMKDlBsYXllckludGVyYWN0EhAKCG9iamVjdElkGAEgASgFEg8K",
+            "B3N1Y2Nlc3MYAiABKAgiMgoOSW50ZXJhY3RSZXN1bHQSEAoIb2JqZWN0SWQY",
+            "ASABKAUSDgoGcmVzdWx0GAIgASgJIiAKD0dhbWVTdGF0ZVVwZGF0ZRINCgVz",
+            "dGF0ZRgBIAEoCSJSCg1OZXR3b3JrUGFja2V0EiEKBHR5cGUYASABKA4yEy5O",
+            "ZXR3b3JrLlBhY2tldFR5cGUSEAoIc2VxdWVuY2UYAiABKAUSDAoEZGF0YRgD",
+            "IAEoDCqGAQoKUGFja2V0VHlwZRIXChNQQUNLRVRfVFlQRV9VTktOT1dOEAAS",
+            "DAoIQzJIX01PVkUQARIRCg1IMkNfTU9WRV9TWU5DEAISFAoQQzJIX0lOVEVS",
+            "QUNUX1JFURAQEhQKEEgyQ19JTlRFUkFDVF9SRVMQERISCg5IMkNfR0FNRV9T",
+            "VEFURRASYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Network.PacketType), }, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Network.Vector3), global::Network.Vector3.Parser, new[]{ "X", "Y", "Z" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Network.Vec3), global::Network.Vec3.Parser, new[]{ "X", "Y", "Z" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Network.PlayerMove), global::Network.PlayerMove.Parser, new[]{ "PlayerId", "Position", "Rotation" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Network.PlayerMoveSync), global::Network.PlayerMoveSync.Parser, new[]{ "PlayerId", "Position", "Rotation" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Network.PlayerMoveSync), global::Network.PlayerMoveSync.Parser, new[]{ "PlayerMoveArr" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Network.PlayerInteract), global::Network.PlayerInteract.Parser, new[]{ "ObjectId", "Success" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Network.InteractResult), global::Network.InteractResult.Parser, new[]{ "ObjectId", "Result" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Network.GameStateUpdate), global::Network.GameStateUpdate.Parser, new[]{ "State" }, null, null, null, null),
@@ -83,16 +82,16 @@ namespace Network {
 
   #region Messages
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
-  public sealed partial class Vector3 : pb::IMessage<Vector3>
+  public sealed partial class Vec3 : pb::IMessage<Vec3>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<Vector3> _parser = new pb::MessageParser<Vector3>(() => new Vector3());
+    private static readonly pb::MessageParser<Vec3> _parser = new pb::MessageParser<Vec3>(() => new Vec3());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pb::MessageParser<Vector3> Parser { get { return _parser; } }
+    public static pb::MessageParser<Vec3> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -108,7 +107,7 @@ namespace Network {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public Vector3() {
+    public Vec3() {
       OnConstruction();
     }
 
@@ -116,7 +115,7 @@ namespace Network {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public Vector3(Vector3 other) : this() {
+    public Vec3(Vec3 other) : this() {
       x_ = other.x_;
       y_ = other.y_;
       z_ = other.z_;
@@ -125,8 +124,8 @@ namespace Network {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public Vector3 Clone() {
-      return new Vector3(this);
+    public Vec3 Clone() {
+      return new Vec3(this);
     }
 
     /// <summary>Field number for the "x" field.</summary>
@@ -168,12 +167,12 @@ namespace Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
-      return Equals(other as Vector3);
+      return Equals(other as Vec3);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(Vector3 other) {
+    public bool Equals(Vec3 other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -272,7 +271,7 @@ namespace Network {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(Vector3 other) {
+    public void MergeFrom(Vec3 other) {
       if (other == null) {
         return;
       }
@@ -418,10 +417,10 @@ namespace Network {
 
     /// <summary>Field number for the "position" field.</summary>
     public const int PositionFieldNumber = 2;
-    private global::Network.Vector3 position_;
+    private global::Network.Vec3 position_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Network.Vector3 Position {
+    public global::Network.Vec3 Position {
       get { return position_; }
       set {
         position_ = value;
@@ -430,10 +429,10 @@ namespace Network {
 
     /// <summary>Field number for the "rotation" field.</summary>
     public const int RotationFieldNumber = 3;
-    private global::Network.Vector3 rotation_;
+    private global::Network.Vec3 rotation_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Network.Vector3 Rotation {
+    public global::Network.Vec3 Rotation {
       get { return rotation_; }
       set {
         rotation_ = value;
@@ -556,13 +555,13 @@ namespace Network {
       }
       if (other.position_ != null) {
         if (position_ == null) {
-          Position = new global::Network.Vector3();
+          Position = new global::Network.Vec3();
         }
         Position.MergeFrom(other.Position);
       }
       if (other.rotation_ != null) {
         if (rotation_ == null) {
-          Rotation = new global::Network.Vector3();
+          Rotation = new global::Network.Vec3();
         }
         Rotation.MergeFrom(other.Rotation);
       }
@@ -591,14 +590,14 @@ namespace Network {
           }
           case 18: {
             if (position_ == null) {
-              Position = new global::Network.Vector3();
+              Position = new global::Network.Vec3();
             }
             input.ReadMessage(Position);
             break;
           }
           case 26: {
             if (rotation_ == null) {
-              Rotation = new global::Network.Vector3();
+              Rotation = new global::Network.Vec3();
             }
             input.ReadMessage(Rotation);
             break;
@@ -628,14 +627,14 @@ namespace Network {
           }
           case 18: {
             if (position_ == null) {
-              Position = new global::Network.Vector3();
+              Position = new global::Network.Vec3();
             }
             input.ReadMessage(Position);
             break;
           }
           case 26: {
             if (rotation_ == null) {
-              Rotation = new global::Network.Vector3();
+              Rotation = new global::Network.Vec3();
             }
             input.ReadMessage(Rotation);
             break;
@@ -685,9 +684,7 @@ namespace Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public PlayerMoveSync(PlayerMoveSync other) : this() {
-      playerId_ = other.playerId_;
-      position_ = other.position_ != null ? other.position_.Clone() : null;
-      rotation_ = other.rotation_ != null ? other.rotation_.Clone() : null;
+      playerMoveArr_ = other.playerMoveArr_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -697,40 +694,15 @@ namespace Network {
       return new PlayerMoveSync(this);
     }
 
-    /// <summary>Field number for the "playerId" field.</summary>
-    public const int PlayerIdFieldNumber = 1;
-    private int playerId_;
+    /// <summary>Field number for the "playerMoveArr" field.</summary>
+    public const int PlayerMoveArrFieldNumber = 1;
+    private static readonly pb::FieldCodec<global::Network.PlayerMove> _repeated_playerMoveArr_codec
+        = pb::FieldCodec.ForMessage(10, global::Network.PlayerMove.Parser);
+    private readonly pbc::RepeatedField<global::Network.PlayerMove> playerMoveArr_ = new pbc::RepeatedField<global::Network.PlayerMove>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int PlayerId {
-      get { return playerId_; }
-      set {
-        playerId_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "position" field.</summary>
-    public const int PositionFieldNumber = 2;
-    private global::Network.Vector3 position_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Network.Vector3 Position {
-      get { return position_; }
-      set {
-        position_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "rotation" field.</summary>
-    public const int RotationFieldNumber = 3;
-    private global::Network.Vector3 rotation_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Network.Vector3 Rotation {
-      get { return rotation_; }
-      set {
-        rotation_ = value;
-      }
+    public pbc::RepeatedField<global::Network.PlayerMove> PlayerMoveArr {
+      get { return playerMoveArr_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -748,9 +720,7 @@ namespace Network {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (PlayerId != other.PlayerId) return false;
-      if (!object.Equals(Position, other.Position)) return false;
-      if (!object.Equals(Rotation, other.Rotation)) return false;
+      if(!playerMoveArr_.Equals(other.playerMoveArr_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -758,9 +728,7 @@ namespace Network {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (PlayerId != 0) hash ^= PlayerId.GetHashCode();
-      if (position_ != null) hash ^= Position.GetHashCode();
-      if (rotation_ != null) hash ^= Rotation.GetHashCode();
+      hash ^= playerMoveArr_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -779,18 +747,7 @@ namespace Network {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (PlayerId != 0) {
-        output.WriteRawTag(8);
-        output.WriteInt32(PlayerId);
-      }
-      if (position_ != null) {
-        output.WriteRawTag(18);
-        output.WriteMessage(Position);
-      }
-      if (rotation_ != null) {
-        output.WriteRawTag(26);
-        output.WriteMessage(Rotation);
-      }
+      playerMoveArr_.WriteTo(output, _repeated_playerMoveArr_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -801,18 +758,7 @@ namespace Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (PlayerId != 0) {
-        output.WriteRawTag(8);
-        output.WriteInt32(PlayerId);
-      }
-      if (position_ != null) {
-        output.WriteRawTag(18);
-        output.WriteMessage(Position);
-      }
-      if (rotation_ != null) {
-        output.WriteRawTag(26);
-        output.WriteMessage(Rotation);
-      }
+      playerMoveArr_.WriteTo(ref output, _repeated_playerMoveArr_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -823,15 +769,7 @@ namespace Network {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (PlayerId != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(PlayerId);
-      }
-      if (position_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Position);
-      }
-      if (rotation_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Rotation);
-      }
+      size += playerMoveArr_.CalculateSize(_repeated_playerMoveArr_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -844,21 +782,7 @@ namespace Network {
       if (other == null) {
         return;
       }
-      if (other.PlayerId != 0) {
-        PlayerId = other.PlayerId;
-      }
-      if (other.position_ != null) {
-        if (position_ == null) {
-          Position = new global::Network.Vector3();
-        }
-        Position.MergeFrom(other.Position);
-      }
-      if (other.rotation_ != null) {
-        if (rotation_ == null) {
-          Rotation = new global::Network.Vector3();
-        }
-        Rotation.MergeFrom(other.Rotation);
-      }
+      playerMoveArr_.Add(other.playerMoveArr_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -878,22 +802,8 @@ namespace Network {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 8: {
-            PlayerId = input.ReadInt32();
-            break;
-          }
-          case 18: {
-            if (position_ == null) {
-              Position = new global::Network.Vector3();
-            }
-            input.ReadMessage(Position);
-            break;
-          }
-          case 26: {
-            if (rotation_ == null) {
-              Rotation = new global::Network.Vector3();
-            }
-            input.ReadMessage(Rotation);
+          case 10: {
+            playerMoveArr_.AddEntriesFrom(input, _repeated_playerMoveArr_codec);
             break;
           }
         }
@@ -915,22 +825,8 @@ namespace Network {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
-          case 8: {
-            PlayerId = input.ReadInt32();
-            break;
-          }
-          case 18: {
-            if (position_ == null) {
-              Position = new global::Network.Vector3();
-            }
-            input.ReadMessage(Position);
-            break;
-          }
-          case 26: {
-            if (rotation_ == null) {
-              Rotation = new global::Network.Vector3();
-            }
-            input.ReadMessage(Rotation);
+          case 10: {
+            playerMoveArr_.AddEntriesFrom(ref input, _repeated_playerMoveArr_codec);
             break;
           }
         }

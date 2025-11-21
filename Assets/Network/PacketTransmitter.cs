@@ -15,11 +15,12 @@ public enum NetworkRole
 
 public class PacketTransmitter : IDisposable
 {
+    public bool IsHost { get; private set; }
+
     private const int PORT = 19826;
     private const int BUFFER_SIZE = 1 << 16;
     private const int PACKET_SIZE = 1 << 10;
 
-    private bool _isHost;
     private UdpClient _udpClient;
     private CancellationTokenSource _cts;
     private PacketHandler _packetHandler;
@@ -76,7 +77,7 @@ public class PacketTransmitter : IDisposable
 
     private void StartAsClient(string hostIP)
     {
-        _isHost = false;
+        IsHost = false;
         try
         {
             _hostEndPoint = new IPEndPoint(IPAddress.Parse(hostIP), PORT);
@@ -97,7 +98,7 @@ public class PacketTransmitter : IDisposable
 
     private void StartAsHost()
     {
-        _isHost = true;
+        IsHost = true;
         try
         {
             _hostEndPoint = new IPEndPoint(IPAddress.Loopback, PORT);
@@ -122,7 +123,7 @@ public class PacketTransmitter : IDisposable
 
     public void SendPacket<T>(PacketType type, T message, IPEndPoint target = null) where T : IMessage<T>
     {
-        if(_isHost)
+        if(IsHost)
         {
             if(target == null)
             {
@@ -159,7 +160,7 @@ public class PacketTransmitter : IDisposable
     {
         if (_udpClient == null) return;
 
-        if (!_isHost)
+        if (!IsHost)
         {
             Log.Error("A client cannot send directly to another client");
             return;
@@ -180,7 +181,7 @@ public class PacketTransmitter : IDisposable
     {
         if (_udpClient == null) return;
 
-        if (!_isHost)
+        if (!IsHost)
         {
             Log.Error("A client cannot broadcast");
             return;
@@ -212,7 +213,7 @@ public class PacketTransmitter : IDisposable
                 result = await _udpClient.ReceiveAsync();
                 sender = result.RemoteEndPoint;
                 byte[] data = result.Buffer;
-                if (_isHost)
+                if (IsHost)
                 {
                     if (_clientEndPoints.TryAdd(sender, 0))
                     {
@@ -227,7 +228,7 @@ public class PacketTransmitter : IDisposable
                     NetworkPacket packet = Deserialize(data);
                     if (packet == null) continue;
 
-                    if (_isHost)
+                    if (IsHost)
                     {
                         _hostReceivedClientLastSeq.AddOrUpdate(
                             sender,
