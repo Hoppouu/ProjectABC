@@ -2,20 +2,24 @@ using Google.Protobuf;
 using Network;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
+public enum NetworkRole
+{
+    HOST,
+    CLIENT
+}
+
 public class PacketTransmitter : IDisposable
 {
-    public bool IsHost { get; private set; }
-
     private const int PORT = 19826;
     private const int BUFFER_SIZE = 1 << 16;
     private const int PACKET_SIZE = 1 << 10;
 
+    private bool _isHost;
     private UdpClient _udpClient;
     private CancellationTokenSource _cts;
     private PacketHandler _packetHandler;
@@ -28,12 +32,25 @@ public class PacketTransmitter : IDisposable
     private ConcurrentDictionary<IPEndPoint, int> _hostSendClientLastSeq, _hostReceivedClientLastSeq;
     private ConcurrentDictionary<IPEndPoint, byte> _clientEndPoints;
     
-    public PacketTransmitter()
+    public PacketTransmitter(NetworkRole role, string hostIP = "")
     {
         _packetHandler = new PacketHandler();
         _cts = new CancellationTokenSource();
         _receivedPackets = new ConcurrentQueue<ReceivedPacket>();
+
+        switch (role)
+        { 
+            case NetworkRole.HOST:
+                StartAsHost();
+                break;
+
+            case NetworkRole.CLIENT:
+                if (String.IsNullOrEmpty(hostIP)) throw new ArgumentException("Client role requires a valid host IP");
+                StartAsClient(hostIP);
+                break;
+        }
     }
+
     public void TickProcessPacketQueue()
     {
         while (_receivedPackets.TryDequeue(out ReceivedPacket receivedPacket))
@@ -57,9 +74,9 @@ public class PacketTransmitter : IDisposable
         }
     }
 
-    public void StartAsClient(string hostIP)
+    private void StartAsClient(string hostIP)
     {
-        IsHost = false;
+        _isHost = false;
         try
         {
             _hostEndPoint = new IPEndPoint(IPAddress.Parse(hostIP), PORT);
@@ -78,14 +95,12 @@ public class PacketTransmitter : IDisposable
         }
     }
 
-    public void StartAsHost()
+    private void StartAsHost()
     {
-        IsHost = true;
-
-        string loopbackIP = "127.0.0.1";
+        _isHost = true;
         try
         {
-            _hostEndPoint = new IPEndPoint(IPAddress.Parse(loopbackIP), PORT);
+            _hostEndPoint = new IPEndPoint(IPAddress.Loopback, PORT);
             _clientEndPoints = new ConcurrentDictionary<IPEndPoint, byte>();
 
             _clientSendHostLastSeq = -1;
@@ -104,13 +119,33 @@ public class PacketTransmitter : IDisposable
             Log.Error($"Host failed to start: {ex.Message}");
         }
     }
-    public void SendToHost<T>(PacketType type, T message) where T : IMessage<T>
+
+    public void SendPacket<T>(PacketType type, T message, IPEndPoint target = null) where T : IMessage<T>
+    {
+        if(_isHost)
+        {
+            if(target == null)
+            {
+                SendByBroadcast(type, message);
+            }
+            else
+            {
+                SendToClient(type, message, target);
+            }
+        }
+        else
+        {
+            SendToHost(type, message);
+        }
+    }
+
+    private void SendToHost<T>(PacketType type, T message) where T : IMessage<T>
     {
         if (_udpClient == null) return;
 
         try
         {
-            byte[] serializedData = Serialize(type, message, GetNextClientSequence(0));
+            byte[] serializedData = Serialize(type, message, GetNextSendSequence(NetworkRole.CLIENT));
             if (serializedData == null) return;
             _udpClient.Send(serializedData, serializedData.Length, _hostEndPoint);
         }
@@ -120,18 +155,18 @@ public class PacketTransmitter : IDisposable
         }
     }
 
-    public void SendToClient<T>(PacketType type, T message, IPEndPoint target) where T : IMessage<T>
+    private void SendToClient<T>(PacketType type, T message, IPEndPoint target) where T : IMessage<T>
     {
         if (_udpClient == null) return;
 
-        if (!IsHost)
+        if (!_isHost)
         {
             Log.Error("A client cannot send directly to another client");
             return;
         }
         try
         {
-            byte[] serializedData = Serialize(type, message, GetNextHostSequence(0, target));
+            byte[] serializedData = Serialize(type, message, GetNextSendSequence(NetworkRole.HOST, target));
             if (serializedData == null) return;
             _udpClient.Send(serializedData, serializedData.Length, target);
         }
@@ -141,11 +176,11 @@ public class PacketTransmitter : IDisposable
         }
     }
 
-    public void SendByBroadcast<T>(PacketType type, T message) where T : IMessage<T>
+    private void SendByBroadcast<T>(PacketType type, T message) where T : IMessage<T>
     {
         if (_udpClient == null) return;
 
-        if (!IsHost)
+        if (!_isHost)
         {
             Log.Error("A client cannot broadcast");
             return;
@@ -156,7 +191,7 @@ public class PacketTransmitter : IDisposable
         {
             try
             {
-                byte[] serializedData = Serialize(type, message, GetNextHostSequence(0, target));
+                byte[] serializedData = Serialize(type, message, GetNextSendSequence(NetworkRole.HOST, target));
                 if (serializedData == null) continue;
                 _udpClient.Send(serializedData, serializedData.Length, target);
             }
@@ -177,7 +212,7 @@ public class PacketTransmitter : IDisposable
                 result = await _udpClient.ReceiveAsync();
                 sender = result.RemoteEndPoint;
                 byte[] data = result.Buffer;
-                if (IsHost)
+                if (_isHost)
                 {
                     if (_clientEndPoints.TryAdd(sender, 0))
                     {
@@ -192,13 +227,21 @@ public class PacketTransmitter : IDisposable
                     NetworkPacket packet = Deserialize(data);
                     if (packet == null) continue;
 
-                    if (IsHost)
+                    if (_isHost)
                     {
-                        if (_hostReceivedClientLastSeq[sender] < packet.Sequence)
-                        {
-                            _receivedPackets.Enqueue(new ReceivedPacket(packet, sender));
-                            _hostReceivedClientLastSeq.AddOrUpdate(sender, packet.Sequence, (_, seq) => seq < packet.Sequence ? packet.Sequence : seq);
-                        }
+                        _hostReceivedClientLastSeq.AddOrUpdate(
+                            sender,
+                            packet.Sequence,
+                            (_, seq) =>
+                            {
+                                if(seq < packet.Sequence)
+                                {
+                                    _receivedPackets.Enqueue(new ReceivedPacket(packet, sender));
+                                    return packet.Sequence;
+                                }
+                                return seq;
+                            }
+                        );
                     }
                     else
                     {
@@ -252,32 +295,21 @@ public class PacketTransmitter : IDisposable
             return null;
         }
     }
-    /// <summary> send = 0, receive = 1 </summary>
-    private int GetNextHostSequence(int state, IPEndPoint target)
+    private int GetNextSendSequence(NetworkRole role)
     {
-        if (state == 0)
+        return role switch
         {
-            return _hostSendClientLastSeq.AddOrUpdate(target, 0, (_, seq) => seq + 1);
-        }
-        else
-        {
-            return _hostReceivedClientLastSeq.AddOrUpdate(target, 0, (_, seq) => seq + 1);
-        }
+            NetworkRole.CLIENT => System.Threading.Interlocked.Increment(ref _clientSendHostLastSeq),
+            _ => throw new ArgumentOutOfRangeException(nameof(role), "Invalid NetworkRole in GetNextSendSequence")
+        };
     }
-
-    /// <summary> send = 0, receive = 1 </summary>
-    private int GetNextClientSequence(int state)
+    private int GetNextSendSequence(NetworkRole role, IPEndPoint target)
     {
-        if (state == 0)
+        return role switch
         {
-            return System.Threading.Interlocked.Increment(ref _clientSendHostLastSeq);
-        }
-        else
-        {
-            return System.Threading.Interlocked.Increment(ref _clientReceivedHostLastSeq);
-        }
-
-
+            NetworkRole.HOST => _hostSendClientLastSeq.AddOrUpdate(target, 0, (_, seq) => seq + 1),
+            _ => throw new ArgumentOutOfRangeException(nameof(role), "Invalid NetworkRole in GetNextSendSequence")
+        };
     }
 
     private class ReceivedPacket
@@ -292,4 +324,3 @@ public class PacketTransmitter : IDisposable
         }
     }
 }
-
