@@ -22,11 +22,12 @@ public class NetworkManager : IDisposable
     private ConcurrentQueue<ReceivedPacket> _receivedPackets;
 
     private IPEndPoint _hostEndPoint;
-    private int _hostSequence, _clientSequence;
-    private List<IPEndPoint> _clientEndPoints;
-    private Dictionary<IPEndPoint, int> _clientLastReceivedSequence;
-    private int _hostLastReceivedSequence;
+    private int _clientSendHostLastSeq, _clientReceivedHostLastSeq;
 
+    //Host전용
+    private ConcurrentDictionary<IPEndPoint, int> _hostSendClientLastSeq, _hostReceivedClientLastSeq;
+    private ConcurrentDictionary<IPEndPoint, byte> _clientEndPoints;
+    
     public NetworkManager()
     {
         _packetHandler = new PacketHandler();
@@ -62,8 +63,8 @@ public class NetworkManager : IDisposable
         try
         {
             _hostEndPoint = new IPEndPoint(IPAddress.Parse(hostIP), PORT);
-            _clientSequence = -1;
-            _hostLastReceivedSequence = -1;
+            _clientSendHostLastSeq = -1;
+            _clientReceivedHostLastSeq = -1;
 
             _udpClient = new UdpClient(0);
             _udpClient.Client.ReceiveBufferSize = BUFFER_SIZE;
@@ -85,11 +86,12 @@ public class NetworkManager : IDisposable
         try
         {
             _hostEndPoint = new IPEndPoint(IPAddress.Parse(loopbackIP), PORT);
-            _clientEndPoints = new List<IPEndPoint>();
-            _clientSequence = -1;
-            _clientLastReceivedSequence = new Dictionary<IPEndPoint, int>();
-            _hostSequence = -1;
-            _hostLastReceivedSequence = -1;
+            _clientEndPoints = new ConcurrentDictionary<IPEndPoint, byte>();
+
+            _clientSendHostLastSeq = -1;
+            _clientReceivedHostLastSeq = -1;
+            _hostSendClientLastSeq = new ConcurrentDictionary<IPEndPoint, int>();
+            _hostReceivedClientLastSeq = new ConcurrentDictionary<IPEndPoint, int>();
 
             _udpClient = new UdpClient(PORT);
             _udpClient.Client.ReceiveBufferSize = BUFFER_SIZE;
@@ -108,7 +110,7 @@ public class NetworkManager : IDisposable
 
         try
         {
-            byte[] serializedData = Serialize(type, message);
+            byte[] serializedData = Serialize(type, message, GetNextClientSequence(0));
             if (serializedData == null) return;
             _udpClient.Send(serializedData, serializedData.Length, _hostEndPoint);
         }
@@ -129,7 +131,7 @@ public class NetworkManager : IDisposable
         }
         try
         {
-            byte[] serializedData = Serialize(type, message);
+            byte[] serializedData = Serialize(type, message, GetNextHostSequence(0, target));
             if (serializedData == null) return;
             _udpClient.Send(serializedData, serializedData.Length, target);
         }
@@ -149,13 +151,13 @@ public class NetworkManager : IDisposable
             return;
         }
 
-        byte[] serializedData = Serialize(type, message);
-        if (serializedData == null) return;
 
-        foreach (IPEndPoint target in _clientEndPoints)
+        foreach (IPEndPoint target in _clientEndPoints.Keys)
         {
             try
             {
+                byte[] serializedData = Serialize(type, message, GetNextHostSequence(0, target));
+                if (serializedData == null) continue;
                 _udpClient.Send(serializedData, serializedData.Length, target);
             }
             catch (Exception ex)
@@ -177,16 +179,12 @@ public class NetworkManager : IDisposable
                 byte[] data = result.Buffer;
                 if (IsHost)
                 {
-                    if (!_clientEndPoints.Contains(sender))
+                    if (_clientEndPoints.TryAdd(sender, 0))
                     {
-                        _clientEndPoints.Add(sender);
                         Log.Info($"New client connected: {sender}");
                     }
-
-                    if (!_clientLastReceivedSequence.ContainsKey(sender))
-                    {
-                        _clientLastReceivedSequence.Add(sender, -1);
-                    }
+                    _hostSendClientLastSeq.TryAdd(sender, -1);
+                    _hostReceivedClientLastSeq.TryAdd(sender, -1);
                 }
 
                 if (data.Length > 0)
@@ -196,18 +194,18 @@ public class NetworkManager : IDisposable
 
                     if (IsHost)
                     {
-                        if (_clientLastReceivedSequence[sender] < packet.Sequence)
+                        if (_hostReceivedClientLastSeq[sender] < packet.Sequence)
                         {
                             _receivedPackets.Enqueue(new ReceivedPacket(packet, sender));
-                            _clientLastReceivedSequence[sender] = packet.Sequence;
+                            _hostReceivedClientLastSeq.AddOrUpdate(sender, packet.Sequence, (_, seq) => seq < packet.Sequence ? packet.Sequence : seq);
                         }
                     }
                     else
                     {
-                        if (_hostLastReceivedSequence < packet.Sequence)
+                        if (_clientReceivedHostLastSeq < packet.Sequence)
                         {
                             _receivedPackets.Enqueue(new ReceivedPacket(packet, sender));
-                            _hostLastReceivedSequence = packet.Sequence;
+                            _clientReceivedHostLastSeq = packet.Sequence;
                         }
                     }
                 }
@@ -222,14 +220,14 @@ public class NetworkManager : IDisposable
         }
     }
 
-    private byte[] Serialize<T>(PacketType type, T message) where T : IMessage<T>
+    private byte[] Serialize<T>(PacketType type, T message, int seq) where T : IMessage<T>
     {
         byte[] data = message.ToByteArray();
-
+        
         NetworkPacket packet = new NetworkPacket()
         {
             Type = type,
-            Sequence = IsHost ? GetNextHostSequence() : GetNextClientSequence(),    //<======== 여기 고쳐야함
+            Sequence = seq,
             Data = ByteString.CopyFrom(data)
         };
         byte[] sendBytes = packet.ToByteArray();
@@ -254,15 +252,32 @@ public class NetworkManager : IDisposable
             return null;
         }
     }
-
-    private int GetNextHostSequence()
+    /// <summary> send = 0, receive = 1 </summary>
+    private int GetNextHostSequence(int state, IPEndPoint target)
     {
-        return System.Threading.Interlocked.Increment(ref _hostSequence);
+        if (state == 0)
+        {
+            return _hostSendClientLastSeq.AddOrUpdate(target, 0, (_, seq) => seq + 1);
+        }
+        else
+        {
+            return _hostReceivedClientLastSeq.AddOrUpdate(target, 0, (_, seq) => seq + 1);
+        }
     }
 
-    private int GetNextClientSequence()
+    /// <summary> send = 0, receive = 1 </summary>
+    private int GetNextClientSequence(int state)
     {
-        return System.Threading.Interlocked.Increment(ref _clientSequence);
+        if (state == 0)
+        {
+            return System.Threading.Interlocked.Increment(ref _clientSendHostLastSeq);
+        }
+        else
+        {
+            return System.Threading.Interlocked.Increment(ref _clientReceivedHostLastSeq);
+        }
+
+
     }
 
     private class ReceivedPacket
