@@ -75,6 +75,25 @@ public class PacketTransmitter : IDisposable
         }
     }
 
+    public void SendPacket<T>(PacketType type, T message, IPEndPoint target = null) where T : IMessage<T>
+    {
+        if (IsHost)
+        {
+            if (target == null)
+            {
+                SendByBroadcast(type, message);
+            }
+            else
+            {
+                SendToClient(type, message, target);
+            }
+        }
+        else
+        {
+            SendToHost(type, message);
+        }
+    }
+
     private void StartAsClient(string hostIP)
     {
         IsHost = false;
@@ -118,25 +137,6 @@ public class PacketTransmitter : IDisposable
         catch (Exception ex)
         {
             Log.Error($"Host failed to start: {ex.Message}");
-        }
-    }
-
-    public void SendPacket<T>(PacketType type, T message, IPEndPoint target = null) where T : IMessage<T>
-    {
-        if(IsHost)
-        {
-            if(target == null)
-            {
-                SendByBroadcast(type, message);
-            }
-            else
-            {
-                SendToClient(type, message, target);
-            }
-        }
-        else
-        {
-            SendToHost(type, message);
         }
     }
 
