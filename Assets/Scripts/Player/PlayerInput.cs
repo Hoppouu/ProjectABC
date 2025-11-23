@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerInput : MonoBehaviour
 {
     private PlayerAction playerAction;
+    [HideInInspector] public bool isMine;
     void Start()
     {
         playerAction = GetComponent<PlayerAction>();
@@ -10,9 +11,15 @@ public class PlayerInput : MonoBehaviour
 
     void Update()
     {
+        if (!isMine) return;
         float inputX = Input.GetAxisRaw("Horizontal");
         float inputY = Input.GetAxisRaw("Vertical");
 
         playerAction.Move(inputX, inputY);
+    }
+
+    private void OnEnable()
+    {
+        GameManager.Instance.players.Add(this.gameObject);
     }
 }
