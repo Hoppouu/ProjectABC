@@ -2,15 +2,17 @@ using UnityEngine;
 
 public class PlayerInput : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private PlayerAction playerAction;
     void Start()
     {
-        
+        playerAction = GetComponent<PlayerAction>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        float inputX = Input.GetAxisRaw("Horizontal");
+        float inputY = Input.GetAxisRaw("Vertical");
+
+        playerAction.Move(inputX, inputY);
     }
 }

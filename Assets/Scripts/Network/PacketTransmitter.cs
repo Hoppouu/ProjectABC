@@ -33,6 +33,8 @@ public class PacketTransmitter : IDisposable
     private ConcurrentDictionary<IPEndPoint, int> _hostSendClientLastSeq, _hostReceivedClientLastSeq;
     private ConcurrentDictionary<IPEndPoint, byte> _clientEndPoints;
     
+    /// <param name="role">NetworkRole 열거형 사용.</param>
+    /// <param name="hostIP">클라이언트 일 경우 넣어야함.</param>
     public PacketTransmitter(NetworkRole role, string hostIP = "")
     {
         _packetHandler = new PacketHandler();
@@ -50,6 +52,10 @@ public class PacketTransmitter : IDisposable
                 StartAsClient(hostIP);
                 break;
         }
+    }
+    ~PacketTransmitter()
+    {
+        this.Dispose();
     }
 
     public void TickProcessPacketQueue()
