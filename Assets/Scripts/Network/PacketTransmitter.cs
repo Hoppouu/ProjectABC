@@ -23,7 +23,6 @@ public class PacketTransmitter : IDisposable
 
     private UdpClient _udpClient;
     private CancellationTokenSource _cts;
-    private PacketHandler _packetHandler;
     private ConcurrentQueue<ReceivedPacket> _receivedPackets;
 
     private IPEndPoint _hostEndPoint;
@@ -37,7 +36,6 @@ public class PacketTransmitter : IDisposable
     /// <param name="hostIP">클라이언트 일 경우 넣어야함.</param>
     public PacketTransmitter(NetworkRole role, string hostIP = "")
     {
-        _packetHandler = new PacketHandler();
         _cts = new CancellationTokenSource();
         _receivedPackets = new ConcurrentQueue<ReceivedPacket>();
 
@@ -58,12 +56,9 @@ public class PacketTransmitter : IDisposable
         this.Dispose();
     }
 
-    public void TickProcessPacketQueue()
+    public bool TryDequeuePacket(out ReceivedPacket packet)
     {
-        while (_receivedPackets.TryDequeue(out ReceivedPacket receivedPacket))
-        {
-            _packetHandler.RoutePacket(receivedPacket.Packet, receivedPacket.Sender);
-        }
+        return _receivedPackets.TryDequeue(out packet);
     }
 
     public void Dispose()
@@ -78,25 +73,6 @@ public class PacketTransmitter : IDisposable
             _udpClient.Close();
             _udpClient = null;
             Log.Info("disposion complete.");
-        }
-    }
-
-    public void SendPacket<T>(PacketType type, T message, IPEndPoint target = null) where T : IMessage<T>
-    {
-        if (IsHost)
-        {
-            if (target == null)
-            {
-                SendByBroadcast(type, message);
-            }
-            else
-            {
-                SendToClient(type, message, target);
-            }
-        }
-        else
-        {
-            SendToHost(type, message);
         }
     }
 
@@ -146,7 +122,7 @@ public class PacketTransmitter : IDisposable
         }
     }
 
-    private void SendToHost<T>(PacketType type, T message) where T : IMessage<T>
+    public void SendToHost<T>(PacketType type, T message) where T : IMessage<T>
     {
         if (_udpClient == null) return;
 
@@ -162,7 +138,7 @@ public class PacketTransmitter : IDisposable
         }
     }
 
-    private void SendToClient<T>(PacketType type, T message, IPEndPoint target) where T : IMessage<T>
+    public void SendToClient<T>(PacketType type, T message, IPEndPoint target) where T : IMessage<T>
     {
         if (_udpClient == null) return;
 
@@ -183,7 +159,7 @@ public class PacketTransmitter : IDisposable
         }
     }
 
-    private void SendByBroadcast<T>(PacketType type, T message) where T : IMessage<T>
+    public void SendByBroadcast<T>(PacketType type, T message) where T : IMessage<T>
     {
         if (_udpClient == null) return;
 
@@ -318,8 +294,11 @@ public class PacketTransmitter : IDisposable
             _ => throw new ArgumentOutOfRangeException(nameof(role), "Invalid NetworkRole in GetNextSendSequence")
         };
     }
+}
 
-    private class ReceivedPacket
+namespace Network
+{
+    public class ReceivedPacket
     {
         public NetworkPacket Packet { get; set; }
         public IPEndPoint Sender { get; set; }

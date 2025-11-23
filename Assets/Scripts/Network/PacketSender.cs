@@ -1,6 +1,6 @@
 using Network;
+using System.Net;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class PacketSender
 {
@@ -13,33 +13,43 @@ public class PacketSender
 
     public void PlayerMove(int playerId, Vector3 position, Vector3 rotation)
     {
-        Network.PlayerMove playerMove = new Network.PlayerMove
+        Network.PlayerInfo playerInfo = new Network.PlayerInfo
         {
             PlayerId = playerId,
             Position = Vector3ToVec3(position),
             Rotation = Vector3ToVec3(rotation)
         };
-        _packetTransmitter.SendPacket(PacketType.C2HMove, playerMove);
+        _packetTransmitter.SendToHost(PacketType.C2HMove, playerInfo);
     }
 
     public void PlayerMoveSync(GameObject[] players)
     {
-
         if (!_packetTransmitter.IsHost) throw new System.InvalidOperationException("PlayerMoveSync should only be called by the host");
 
-        Network.PlayerMoveSync playerMoveSync = new Network.PlayerMoveSync();
+        Network.PlayerInfoList playerInfoList = new Network.PlayerInfoList();
         foreach (GameObject player in players)
         {
-            Network.PlayerMove playerMove = new Network.PlayerMove
+            Network.PlayerInfo playerList = new Network.PlayerInfo
             {
                 PlayerId = 0,
                 Position = Vector3ToVec3(player.transform.position),
                 Rotation = Vector3ToVec3(player.transform.rotation.eulerAngles)
             };
-            playerMoveSync.PlayerMoveArr.Add(playerMove);
+            playerInfoList.List.Add(playerList);
         }
 
-        _packetTransmitter.SendPacket(PacketType.H2CMoveSync, playerMoveSync);
+        _packetTransmitter.SendToHost(PacketType.H2CMoveSync, playerInfoList);
+    }
+    
+    public void PlayerJoin(int playerId)
+    {
+        Network.PlayerInfo playerInfo = new Network.PlayerInfo
+        {
+            PlayerId = playerId,
+            Position = Vector3ToVec3(Vector3.zero),
+            Rotation = Vector3ToVec3(Vector3.zero)
+        };
+        _packetTransmitter.SendToHost(PacketType.C2HPlayerJoin, playerInfo);
     }
 
     private Vec3 Vector3ToVec3(Vector3 vector)

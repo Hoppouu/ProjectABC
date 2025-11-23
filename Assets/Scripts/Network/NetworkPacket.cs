@@ -25,28 +25,29 @@ namespace Network {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChNOZXR3b3JrUGFja2V0LnByb3RvEgdOZXR3b3JrIicKBFZlYzMSCQoBeBgB",
-            "IAEoAhIJCgF5GAIgASgCEgkKAXoYAyABKAIiYAoKUGxheWVyTW92ZRIQCghw",
+            "IAEoAhIJCgF5GAIgASgCEgkKAXoYAyABKAIiYAoKUGxheWVySW5mbxIQCghw",
             "bGF5ZXJJZBgBIAEoBRIfCghwb3NpdGlvbhgCIAEoCzINLk5ldHdvcmsuVmVj",
-            "MxIfCghyb3RhdGlvbhgDIAEoCzINLk5ldHdvcmsuVmVjMyI8Cg5QbGF5ZXJN",
-            "b3ZlU3luYxIqCg1wbGF5ZXJNb3ZlQXJyGAEgAygLMhMuTmV0d29yay5QbGF5",
-            "ZXJNb3ZlIjMKDlBsYXllckludGVyYWN0EhAKCG9iamVjdElkGAEgASgFEg8K",
-            "B3N1Y2Nlc3MYAiABKAgiMgoOSW50ZXJhY3RSZXN1bHQSEAoIb2JqZWN0SWQY",
-            "ASABKAUSDgoGcmVzdWx0GAIgASgJIiAKD0dhbWVTdGF0ZVVwZGF0ZRINCgVz",
-            "dGF0ZRgBIAEoCSJSCg1OZXR3b3JrUGFja2V0EiEKBHR5cGUYASABKA4yEy5O",
-            "ZXR3b3JrLlBhY2tldFR5cGUSEAoIc2VxdWVuY2UYAiABKAUSDAoEZGF0YRgD",
-            "IAEoDCqGAQoKUGFja2V0VHlwZRIXChNQQUNLRVRfVFlQRV9VTktOT1dOEAAS",
-            "DAoIQzJIX01PVkUQARIRCg1IMkNfTU9WRV9TWU5DEAISFAoQQzJIX0lOVEVS",
-            "QUNUX1JFURAQEhQKEEgyQ19JTlRFUkFDVF9SRVMQERISCg5IMkNfR0FNRV9T",
-            "VEFURRASYgZwcm90bzM="));
+            "MxIfCghyb3RhdGlvbhgDIAEoCzINLk5ldHdvcmsuVmVjMyIzCg5QbGF5ZXJJ",
+            "bmZvTGlzdBIhCgRsaXN0GAEgAygLMhMuTmV0d29yay5QbGF5ZXJJbmZvIjMK",
+            "DlBsYXllckludGVyYWN0EhAKCG9iamVjdElkGAEgASgFEg8KB3N1Y2Nlc3MY",
+            "AiABKAgiMgoOSW50ZXJhY3RSZXN1bHQSEAoIb2JqZWN0SWQYASABKAUSDgoG",
+            "cmVzdWx0GAIgASgJIhoKCUdhbWVTdGF0ZRINCgVzdGF0ZRgBIAEoCSJSCg1O",
+            "ZXR3b3JrUGFja2V0EiEKBHR5cGUYASABKA4yEy5OZXR3b3JrLlBhY2tldFR5",
+            "cGUSEAoIc2VxdWVuY2UYAiABKAUSDAoEZGF0YRgDIAEoDCrLAQoKUGFja2V0",
+            "VHlwZRIXChNQQUNLRVRfVFlQRV9VTktOT1dOEAASDAoIQzJIX01PVkUQARIR",
+            "Cg1IMkNfTU9WRV9TWU5DEAISFAoQQzJIX0lOVEVSQUNUX1JFURAQEhQKEEgy",
+            "Q19JTlRFUkFDVF9SRVMQERISCg5IMkNfR0FNRV9TVEFURRASEhQKEEMySF9K",
+            "T0lOX1JFUVVFU1QQExITCg9DMkhfUExBWUVSX0pPSU4QFBIYChRIMkNfUExB",
+            "WUVSX0pPSU5fU1lOQxAVYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Network.PacketType), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Network.Vec3), global::Network.Vec3.Parser, new[]{ "X", "Y", "Z" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Network.PlayerMove), global::Network.PlayerMove.Parser, new[]{ "PlayerId", "Position", "Rotation" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Network.PlayerMoveSync), global::Network.PlayerMoveSync.Parser, new[]{ "PlayerMoveArr" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Network.PlayerInfo), global::Network.PlayerInfo.Parser, new[]{ "PlayerId", "Position", "Rotation" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Network.PlayerInfoList), global::Network.PlayerInfoList.Parser, new[]{ "List" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Network.PlayerInteract), global::Network.PlayerInteract.Parser, new[]{ "ObjectId", "Success" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Network.InteractResult), global::Network.InteractResult.Parser, new[]{ "ObjectId", "Result" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Network.GameStateUpdate), global::Network.GameStateUpdate.Parser, new[]{ "State" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Network.GameState), global::Network.GameState.Parser, new[]{ "State" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Network.NetworkPacket), global::Network.NetworkPacket.Parser, new[]{ "Type", "Sequence", "Data" }, null, null, null, null)
           }));
     }
@@ -76,6 +77,9 @@ namespace Network {
     /// 게임 상태 변경
     /// </summary>
     [pbr::OriginalName("H2C_GAME_STATE")] H2CGameState = 18,
+    [pbr::OriginalName("C2H_JOIN_REQUEST")] C2HJoinRequest = 19,
+    [pbr::OriginalName("C2H_PLAYER_JOIN")] C2HPlayerJoin = 20,
+    [pbr::OriginalName("H2C_PLAYER_JOIN_SYNC")] H2CPlayerJoinSync = 21,
   }
 
   #endregion
@@ -353,20 +357,17 @@ namespace Network {
 
   }
 
-  /// <summary>
-  /// C2H_MOVE
-  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
-  public sealed partial class PlayerMove : pb::IMessage<PlayerMove>
+  public sealed partial class PlayerInfo : pb::IMessage<PlayerInfo>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<PlayerMove> _parser = new pb::MessageParser<PlayerMove>(() => new PlayerMove());
+    private static readonly pb::MessageParser<PlayerInfo> _parser = new pb::MessageParser<PlayerInfo>(() => new PlayerInfo());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pb::MessageParser<PlayerMove> Parser { get { return _parser; } }
+    public static pb::MessageParser<PlayerInfo> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -382,7 +383,7 @@ namespace Network {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public PlayerMove() {
+    public PlayerInfo() {
       OnConstruction();
     }
 
@@ -390,7 +391,7 @@ namespace Network {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public PlayerMove(PlayerMove other) : this() {
+    public PlayerInfo(PlayerInfo other) : this() {
       playerId_ = other.playerId_;
       position_ = other.position_ != null ? other.position_.Clone() : null;
       rotation_ = other.rotation_ != null ? other.rotation_.Clone() : null;
@@ -399,8 +400,8 @@ namespace Network {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public PlayerMove Clone() {
-      return new PlayerMove(this);
+    public PlayerInfo Clone() {
+      return new PlayerInfo(this);
     }
 
     /// <summary>Field number for the "playerId" field.</summary>
@@ -442,12 +443,12 @@ namespace Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
-      return Equals(other as PlayerMove);
+      return Equals(other as PlayerInfo);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(PlayerMove other) {
+    public bool Equals(PlayerInfo other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -546,7 +547,7 @@ namespace Network {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(PlayerMove other) {
+    public void MergeFrom(PlayerInfo other) {
       if (other == null) {
         return;
       }
@@ -646,20 +647,17 @@ namespace Network {
 
   }
 
-  /// <summary>
-  /// H2C_MOVE_SYNC
-  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
-  public sealed partial class PlayerMoveSync : pb::IMessage<PlayerMoveSync>
+  public sealed partial class PlayerInfoList : pb::IMessage<PlayerInfoList>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<PlayerMoveSync> _parser = new pb::MessageParser<PlayerMoveSync>(() => new PlayerMoveSync());
+    private static readonly pb::MessageParser<PlayerInfoList> _parser = new pb::MessageParser<PlayerInfoList>(() => new PlayerInfoList());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pb::MessageParser<PlayerMoveSync> Parser { get { return _parser; } }
+    public static pb::MessageParser<PlayerInfoList> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -675,7 +673,7 @@ namespace Network {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public PlayerMoveSync() {
+    public PlayerInfoList() {
       OnConstruction();
     }
 
@@ -683,44 +681,44 @@ namespace Network {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public PlayerMoveSync(PlayerMoveSync other) : this() {
-      playerMoveArr_ = other.playerMoveArr_.Clone();
+    public PlayerInfoList(PlayerInfoList other) : this() {
+      list_ = other.list_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public PlayerMoveSync Clone() {
-      return new PlayerMoveSync(this);
+    public PlayerInfoList Clone() {
+      return new PlayerInfoList(this);
     }
 
-    /// <summary>Field number for the "playerMoveArr" field.</summary>
-    public const int PlayerMoveArrFieldNumber = 1;
-    private static readonly pb::FieldCodec<global::Network.PlayerMove> _repeated_playerMoveArr_codec
-        = pb::FieldCodec.ForMessage(10, global::Network.PlayerMove.Parser);
-    private readonly pbc::RepeatedField<global::Network.PlayerMove> playerMoveArr_ = new pbc::RepeatedField<global::Network.PlayerMove>();
+    /// <summary>Field number for the "list" field.</summary>
+    public const int ListFieldNumber = 1;
+    private static readonly pb::FieldCodec<global::Network.PlayerInfo> _repeated_list_codec
+        = pb::FieldCodec.ForMessage(10, global::Network.PlayerInfo.Parser);
+    private readonly pbc::RepeatedField<global::Network.PlayerInfo> list_ = new pbc::RepeatedField<global::Network.PlayerInfo>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<global::Network.PlayerMove> PlayerMoveArr {
-      get { return playerMoveArr_; }
+    public pbc::RepeatedField<global::Network.PlayerInfo> List {
+      get { return list_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
-      return Equals(other as PlayerMoveSync);
+      return Equals(other as PlayerInfoList);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(PlayerMoveSync other) {
+    public bool Equals(PlayerInfoList other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if(!playerMoveArr_.Equals(other.playerMoveArr_)) return false;
+      if(!list_.Equals(other.list_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -728,7 +726,7 @@ namespace Network {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      hash ^= playerMoveArr_.GetHashCode();
+      hash ^= list_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -747,7 +745,7 @@ namespace Network {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      playerMoveArr_.WriteTo(output, _repeated_playerMoveArr_codec);
+      list_.WriteTo(output, _repeated_list_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -758,7 +756,7 @@ namespace Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      playerMoveArr_.WriteTo(ref output, _repeated_playerMoveArr_codec);
+      list_.WriteTo(ref output, _repeated_list_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -769,7 +767,7 @@ namespace Network {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      size += playerMoveArr_.CalculateSize(_repeated_playerMoveArr_codec);
+      size += list_.CalculateSize(_repeated_list_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -778,11 +776,11 @@ namespace Network {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(PlayerMoveSync other) {
+    public void MergeFrom(PlayerInfoList other) {
       if (other == null) {
         return;
       }
-      playerMoveArr_.Add(other.playerMoveArr_);
+      list_.Add(other.list_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -803,7 +801,7 @@ namespace Network {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            playerMoveArr_.AddEntriesFrom(input, _repeated_playerMoveArr_codec);
+            list_.AddEntriesFrom(input, _repeated_list_codec);
             break;
           }
         }
@@ -826,7 +824,7 @@ namespace Network {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 10: {
-            playerMoveArr_.AddEntriesFrom(ref input, _repeated_playerMoveArr_codec);
+            list_.AddEntriesFrom(ref input, _repeated_list_codec);
             break;
           }
         }
@@ -1316,16 +1314,16 @@ namespace Network {
   /// H2C_GAME_STATE
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
-  public sealed partial class GameStateUpdate : pb::IMessage<GameStateUpdate>
+  public sealed partial class GameState : pb::IMessage<GameState>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<GameStateUpdate> _parser = new pb::MessageParser<GameStateUpdate>(() => new GameStateUpdate());
+    private static readonly pb::MessageParser<GameState> _parser = new pb::MessageParser<GameState>(() => new GameState());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pb::MessageParser<GameStateUpdate> Parser { get { return _parser; } }
+    public static pb::MessageParser<GameState> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1341,7 +1339,7 @@ namespace Network {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public GameStateUpdate() {
+    public GameState() {
       OnConstruction();
     }
 
@@ -1349,15 +1347,15 @@ namespace Network {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public GameStateUpdate(GameStateUpdate other) : this() {
+    public GameState(GameState other) : this() {
       state_ = other.state_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public GameStateUpdate Clone() {
-      return new GameStateUpdate(this);
+    public GameState Clone() {
+      return new GameState(this);
     }
 
     /// <summary>Field number for the "state" field.</summary>
@@ -1375,12 +1373,12 @@ namespace Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
-      return Equals(other as GameStateUpdate);
+      return Equals(other as GameState);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(GameStateUpdate other) {
+    public bool Equals(GameState other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -1453,7 +1451,7 @@ namespace Network {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(GameStateUpdate other) {
+    public void MergeFrom(GameState other) {
       if (other == null) {
         return;
       }
