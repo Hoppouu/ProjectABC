@@ -3,15 +3,15 @@ using UnityEngine;
 
 public class PacketDispatcher : MonoBehaviour
 {
+    private PacketTransmitter _packetTransmitter;
     public PacketHandler PacketHandler { get; private set; }
     public PacketSender PacketSender { get; private set; }
-    private PacketTransmitter _packetTransmitter;
 
     public void Setup(NetworkRole role, string hostIP = "")
     {
         _packetTransmitter = new PacketTransmitter(role, hostIP);
         PacketSender = new PacketSender(_packetTransmitter);
-        PacketHandler = new PacketHandler();
+        PacketHandler = new PacketHandler(PacketSender);
     }
 
     public void TickProcessPacketQueue()

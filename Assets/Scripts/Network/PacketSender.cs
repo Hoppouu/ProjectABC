@@ -1,4 +1,5 @@
 using Network;
+using System;
 using System.Net;
 using UnityEngine;
 
@@ -50,6 +51,22 @@ public class PacketSender
             Rotation = Vector3ToVec3(Vector3.zero)
         };
         _packetTransmitter.SendToHost(PacketType.C2HPlayerJoin, playerInfo);
+    }
+
+    public void JoinRequest()
+    {
+        _packetTransmitter.SendToHost(PacketType.C2HJoinRequest, new Empty());
+    }
+
+    public void JoinResponse(int playerID, IPEndPoint target)
+    {
+        Network.PlayerInfo playerInfo = new Network.PlayerInfo
+        {
+            PlayerId = playerID,
+            Position = Vector3ToVec3(Vector3.zero),
+            Rotation = Vector3ToVec3(Vector3.zero)
+        };
+        _packetTransmitter.SendToClient(PacketType.H2CJoinResponse, playerInfo, target);
     }
 
     private Vec3 Vector3ToVec3(Vector3 vector)

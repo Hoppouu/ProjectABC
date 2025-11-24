@@ -1,14 +1,32 @@
+using Manager;
 using System.Collections.Generic;
 using System.Data;
+using System.Net;
 using UnityEngine;
+
+namespace Manager
+{
+    public class PlayerEntry
+    {
+        public int id;
+        public IPEndPoint ipEndPoint;
+        public GameObject gameObject;
+
+        public PlayerEntry(int id, IPEndPoint ipEndPoint, GameObject gameObject)
+        {
+            this.id = id;
+            this.ipEndPoint = ipEndPoint;
+            this.gameObject = gameObject;
+        }
+    }
+}
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     public GameObject prefab;
-    [HideInInspector] public List<GameObject> players;
-
-    public PacketDispatcher packetDispatcher;
+    
+    [HideInInspector] private Dictionary<int, PlayerEntry> players;
     private void Awake()
     {
         if(Instance == null)
@@ -21,32 +39,20 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+        players = new Dictionary<int, PlayerEntry>();
     }
 
-    private void Start()
+    public void AddPlayer(int playerID, IPEndPoint ipEndPoint, bool isMine)
     {
-
+        players[playerID] = new PlayerEntry(playerID, ipEndPoint, CreatePlayerPrefab(isMine));
     }
 
-    private void PlayerJoin(int playerID)
+    public GameObject CreatePlayerPrefab(bool isMine)
     {
         GameObject gameObject = Instantiate(prefab);
-        gameObject.GetComponent<PlayerInput>().isMine = false;
-    }
+        gameObject.GetComponent<PlayerInput>().isMine = isMine;
 
-    public void StartAsHost()
-    {
-        packetDispatcher.Setup(NetworkRole.HOST);
-        GameObject gameObject = Instantiate(prefab);
-        gameObject.GetComponent<PlayerInput>().isMine = true;
-        packetDispatcher.PacketHandler.OnPlayerJoin += PlayerJoin;
-    }
-
-    public void StartAsClient(string hostIp)
-    {
-        packetDispatcher.Setup(NetworkRole.CLIENT, hostIp);
-        GameObject gameObject = Instantiate(prefab);
-        gameObject.GetComponent<PlayerInput>().isMine = true;
-        packetDispatcher.PacketSender.PlayerJoin(1);
+        return gameObject;
     }
 }

@@ -17,9 +17,4 @@ public class PlayerInput : MonoBehaviour
 
         playerAction.Move(inputX, inputY);
     }
-
-    private void OnEnable()
-    {
-        GameManager.Instance.players.Add(this.gameObject);
-    }
 }

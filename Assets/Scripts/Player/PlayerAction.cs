@@ -12,7 +12,6 @@ public class PlayerAction : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        GameManager.Instance.packetDispatcher.PacketSender.PlayerMove(0, this.transform.position, this.transform.rotation.eulerAngles);
     }
 
     public void Move(float x, float y)
