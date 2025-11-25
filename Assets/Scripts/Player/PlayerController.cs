@@ -16,27 +16,10 @@ public class PlayerController : MonoBehaviour
         _animator = GetComponent<Animator>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        if(GameManager.Instance != null)
-        {
-            GameManager.Instance.inputHandler.OnRunInput += Run;
-            GameManager.Instance.inputHandler.OnWalkInput += Walk;
-            GameManager.Instance.inputHandler.OnMouseInput += RotateBody;
-            GameManager.Instance.inputHandler.OnJumpInput += Jump;
-        }
     }
 
     void Start()
     {
-    }
-    private void OnDisable()
-    {
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.inputHandler.OnRunInput -= Run;
-            GameManager.Instance.inputHandler.OnWalkInput -= Walk;
-            GameManager.Instance.inputHandler.OnMouseInput -= RotateBody;
-            GameManager.Instance.inputHandler.OnJumpInput -= Jump;
-        }
     }
 
     void Walk(Vector3 input)

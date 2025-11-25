@@ -24,7 +24,6 @@ namespace Manager
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
-    public InputHandler inputHandler;
     public GameObject prefab;
     
     private Dictionary<int, PlayerEntry> players;

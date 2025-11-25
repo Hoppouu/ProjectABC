@@ -10,18 +10,6 @@ public class CameraController : MonoBehaviour
     private float _mouseY;
     private float _currentXRotation;
 
-    void OnEnable()
-    {
-        if (GameManager.Instance != null)
-            GameManager.Instance.inputHandler.OnMouseInput += HandleInput;
-    }
-
-    void OnDisable()
-    {
-        if (GameManager.Instance != null)
-            GameManager.Instance.inputHandler.OnMouseInput -= HandleInput;
-    }
-
     void HandleInput(Vector2 input)
     {
         _mouseX = input.x * mouseSensitivity;
