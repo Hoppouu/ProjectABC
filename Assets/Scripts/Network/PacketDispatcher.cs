@@ -25,7 +25,6 @@ public class PacketDispatcher : MonoBehaviour
     {
         if (_packetTransmitter == null || PacketHandler == null) return;
         TickProcessPacketQueue();
-
     }
 
     private void OnDestroy()

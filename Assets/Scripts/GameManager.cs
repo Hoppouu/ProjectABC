@@ -27,7 +27,7 @@ public class GameManager : MonoBehaviour
     public InputHandler inputHandler;
     public GameObject prefab;
     
-    [HideInInspector] private Dictionary<int, PlayerEntry> players;
+    private Dictionary<int, PlayerEntry> players;
     private void Awake()
     {
         if(Instance == null)

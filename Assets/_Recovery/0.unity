@@ -879,6 +879,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2aebbf2b8ac3d53459bc72b6f6682409, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAction
+  playerID: 0
 --- !u!114 &1462217934
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -891,6 +892,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d84bc6ef4840f624ba28386feac61bf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInput
+  isMine: 0
 --- !u!1 &1891858110
 GameObject:
   m_ObjectHideFlags: 0

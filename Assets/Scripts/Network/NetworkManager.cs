@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class NetworkManager : MonoBehaviour
 {
-    public NetworkManager Instance { get; private set; }
+    public static NetworkManager Instance { get; private set; }
     public PacketDispatcher packetDispatcher;
 
     private int _nextPlayerID = 2;
