@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.github-glitchenzo.nugetforunity": {
+      "version": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "34432703a177c97631a4eb1d908f086037c67969"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
@@ -121,22 +128,9 @@
     },
     "com.unity.nuget.newtonsoft-json": {
       "version": "3.2.1",
-      "depth": 2,
+      "depth": 3,
       "source": "registry",
       "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.purchasing": {
-      "version": "4.12.2",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.ugui": "1.0.0",
-        "com.unity.services.core": "1.12.5",
-        "com.unity.modules.androidjni": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0",
-        "com.unity.modules.unitywebrequest": "1.0.0"
-      },
       "url": "https://packages.unity.com"
     },
     "com.unity.render-pipelines.core": {
@@ -154,22 +148,26 @@
         "com.unity.rendering.light-transport": "1.0.1"
       }
     },
-    "com.unity.render-pipelines.universal": {
+    "com.unity.render-pipelines.high-definition": {
       "version": "17.2.0",
       "depth": 0,
       "source": "builtin",
       "dependencies": {
+        "com.unity.modules.video": "1.0.0",
+        "com.unity.modules.animation": "1.0.0",
+        "com.unity.modules.imageconversion": "1.0.0",
         "com.unity.render-pipelines.core": "17.2.0",
         "com.unity.shadergraph": "17.2.0",
-        "com.unity.render-pipelines.universal-config": "17.0.3"
+        "com.unity.visualeffectgraph": "17.2.0",
+        "com.unity.render-pipelines.high-definition-config": "17.2.0"
       }
     },
-    "com.unity.render-pipelines.universal-config": {
-      "version": "17.0.3",
-      "depth": 1,
-      "source": "builtin",
+    "com.unity.render-pipelines.high-definition-config": {
+      "version": "file:com.unity.render-pipelines.high-definition-config",
+      "depth": 0,
+      "source": "embedded",
       "dependencies": {
-        "com.unity.render-pipelines.core": "17.0.3"
+        "com.unity.render-pipelines.core": "17.2.0"
       }
     },
     "com.unity.rendering.light-transport": {
@@ -202,7 +200,7 @@
     },
     "com.unity.services.core": {
       "version": "1.14.0",
-      "depth": 1,
+      "depth": 2,
       "source": "registry",
       "dependencies": {
         "com.unity.modules.androidjni": "1.0.0",
@@ -259,6 +257,15 @@
       "dependencies": {
         "com.unity.modules.ui": "1.0.0",
         "com.unity.modules.imgui": "1.0.0"
+      }
+    },
+    "com.unity.visualeffectgraph": {
+      "version": "17.2.0",
+      "depth": 1,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.shadergraph": "17.2.0",
+        "com.unity.render-pipelines.core": "17.2.0"
       }
     },
     "com.unity.xr.legacyinputhelpers": {
