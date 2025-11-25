@@ -24,6 +24,7 @@ namespace Manager
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
+    public InputHandler inputHandler;
     public GameObject prefab;
     
     [HideInInspector] private Dictionary<int, PlayerEntry> players;
@@ -39,7 +40,10 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+    }
 
+    void Update()
+    {
         players = new Dictionary<int, PlayerEntry>();
     }
 
