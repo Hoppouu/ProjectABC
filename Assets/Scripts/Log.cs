@@ -40,7 +40,6 @@ public static class Log
         string fileName = System.IO.Path.GetFileNameWithoutExtension(filePath);
         UnityEngine.Debug.LogError(GetFormattedMessage(fileName, memberName, message), component);
     }
-
     private static string GetFormattedMessage(string fileName, string memberName, string message)
     {
         return $"[{fileName}] {memberName}: {message}";
