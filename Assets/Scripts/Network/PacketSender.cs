@@ -1,76 +1,99 @@
-using Network;
-using System;
-using System.Net;
+﻿using System.Net;
 using UnityEngine;
+using Manager;
+using System.Collections.Generic;
 
-public class PacketSender
+namespace Network
 {
-    private PacketTransmitter _packetTransmitter;
-
-    public PacketSender(PacketTransmitter packetTransmitter)
+    public class PacketSenderBase
     {
-        _packetTransmitter = packetTransmitter;
-    }
+        protected readonly PacketTransmitter _packetTransmitter;
 
-    public void PlayerMove(int playerId, Vector3 position, Vector3 rotation)
-    {
-        Network.PlayerInfo playerInfo = new Network.PlayerInfo
+        public PacketSenderBase(PacketTransmitter packetTransmitter)
         {
-            PlayerId = playerId,
-            Position = Vector3ToVec3(position),
-            Rotation = Vector3ToVec3(rotation)
-        };
-        _packetTransmitter.SendToHost(PacketType.C2HMove, playerInfo);
-    }
-
-    public void PlayerMoveSync(GameObject[] players)
-    {
-        if (!_packetTransmitter.IsHost) throw new System.InvalidOperationException("PlayerMoveSync should only be called by the host");
-
-        Network.PlayerInfoList playerInfoList = new Network.PlayerInfoList();
-        foreach (GameObject player in players)
+            _packetTransmitter = packetTransmitter;
+        }
+        protected Vec3 ToVec3(Vector3 vector)
         {
-            Network.PlayerInfo playerList = new Network.PlayerInfo
+            return new Vec3 { X = vector.x, Y = vector.y, Z = vector.z };
+        }
+        protected PlayerInfo ToPlayerInfo(PlayerEntry playerEntry)
+        {
+            Network.PlayerInfo playerInfo = new Network.PlayerInfo()
             {
-                PlayerId = 0,
-                Position = Vector3ToVec3(player.transform.position),
-                Rotation = Vector3ToVec3(player.transform.rotation.eulerAngles)
+                PlayerId = playerEntry.id,
+                Position = ToVec3(playerEntry.gameObject.transform.position),
+                Rotation = ToVec3(playerEntry.gameObject.transform.rotation.eulerAngles)
             };
-            playerInfoList.List.Add(playerList);
+
+            return playerInfo;
         }
 
-        _packetTransmitter.SendToHost(PacketType.H2CMoveSync, playerInfoList);
-    }
-    
-    public void PlayerJoin(int playerId)
-    {
-        Network.PlayerInfo playerInfo = new Network.PlayerInfo
+        protected PlayerInfoList ToPlayerInfoList(List<PlayerEntry> playerEntries)
         {
-            PlayerId = playerId,
-            Position = Vector3ToVec3(Vector3.zero),
-            Rotation = Vector3ToVec3(Vector3.zero)
-        };
-        _packetTransmitter.SendToHost(PacketType.C2HPlayerJoin, playerInfo);
+            Network.PlayerInfoList playerInfoList = new PlayerInfoList();
+
+            foreach (PlayerEntry playerEntry in playerEntries)
+            {
+                playerInfoList.List.Add(ToPlayerInfo(playerEntry));
+            }
+
+            return playerInfoList;
+        }
     }
 
-    public void JoinRequest()
+    public class HostPacketSender : PacketSenderBase
     {
-        _packetTransmitter.SendToHost(PacketType.C2HJoinRequest, new Empty());
-    }
+        public HostPacketSender(PacketTransmitter packetTransmitter) : base(packetTransmitter) { }
 
-    public void JoinResponse(int playerID, IPEndPoint target)
-    {
-        Network.PlayerInfo playerInfo = new Network.PlayerInfo
+        public void BroadcastPlayersInfo(List<PlayerEntry> players)
         {
-            PlayerId = playerID,
-            Position = Vector3ToVec3(Vector3.zero),
-            Rotation = Vector3ToVec3(Vector3.zero)
-        };
-        _packetTransmitter.SendToClient(PacketType.H2CJoinResponse, playerInfo, target);
+            if (!_packetTransmitter.IsHost) throw new System.InvalidOperationException("PlayerMoveSync should only be called by the host");
+
+            _packetTransmitter.SendToHost(PacketType.H2CMoveSync, ToPlayerInfoList(players));
+        }
+        public void SendJoinResponse(int playerID, List<PlayerEntry> palyers, IPEndPoint target)
+        {
+            Network.PlayerInfo yourInfo = new Network.PlayerInfo
+            {
+                PlayerId = playerID,
+            };
+
+            _packetTransmitter.SendToClient(PacketType.H2CJoinResponse, yourInfo, target);
+            _packetTransmitter.SendToClient(PacketType.H2CPlayerJoinSync, ToPlayerInfoList(palyers), target);
+        }
     }
 
-    private Vec3 Vector3ToVec3(Vector3 vector)
+    public class ClientPacketSender : PacketSenderBase
     {
-        return new Vec3 { X = vector.x, Y = vector.y, Z = vector.z };
+        public ClientPacketSender(PacketTransmitter packetTransmitter) : base(packetTransmitter) { }
+        public void SendPlayerInfo(PlayerEntry playerEntry)
+        {
+            _packetTransmitter.SendToHost(PacketType.C2HMove, ToPlayerInfo(playerEntry));
+        }
+        public void SendJoinRequest()
+        {
+            _packetTransmitter.SendToHost(PacketType.C2HJoinRequest, new Empty());
+        }
+    }
+
+
+    public class PacketSender
+    {
+        public HostPacketSender Host { get; }
+        public ClientPacketSender Client { get; }
+        public PacketSender(PacketTransmitter packetTransmitter)
+        {
+            if (packetTransmitter.IsHost)
+            {
+                Host = new HostPacketSender(packetTransmitter);
+                Client = new ClientPacketSender(packetTransmitter);
+            }
+            else
+            {
+                Host = null;
+                Client = new ClientPacketSender(packetTransmitter);
+            }
+        }
     }
 }

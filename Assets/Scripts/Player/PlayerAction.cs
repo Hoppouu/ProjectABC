@@ -17,7 +17,7 @@ public class PlayerAction : MonoBehaviour
     public void Move(float x, float y)
     {
         this.transform.Translate(new Vector3(x, 0, y) * Time.deltaTime * 5.0f);
-        NetworkManager.Instance.packetDispatcher.PacketSender.PlayerMove(playerID, this.transform.position, this.transform.rotation.eulerAngles);
+        //NetworkManager.Instance.packetDispatcher.ClientSender.PlayerMove(playerID, this.transform.position, this.transform.rotation.eulerAngles);
     }
 
     public void Attack()
