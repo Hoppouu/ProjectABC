@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using UnityEditor.Rendering;
 
 namespace Network
 {
@@ -124,13 +125,13 @@ namespace Network
             }
         }
 
-        public void SendToHost<T>(PacketType type, T message) where T : IMessage<T>
+        public void SendToHost<T>(PacketType packetType, T message) where T : IMessage<T>
         {
             if (_udpClient == null) return;
 
             try
             {
-                byte[] serializedData = Serialize(type, message, GetNextSendSequence(NetworkRole.CLIENT));
+                byte[] serializedData = Serialize(packetType, message, GetNextSendSequence(NetworkRole.CLIENT));
                 if (serializedData == null) return;
                 _udpClient.Send(serializedData, serializedData.Length, _hostEndPoint);
             }
@@ -140,7 +141,7 @@ namespace Network
             }
         }
 
-        public void SendToClient<T>(PacketType type, T message, IPEndPoint target) where T : IMessage<T>
+        public void SendToClient<T>(PacketType packetType, T message, IPEndPoint target) where T : IMessage<T>
         {
             if (_udpClient == null) return;
 
@@ -151,7 +152,7 @@ namespace Network
             }
             try
             {
-                byte[] serializedData = Serialize(type, message, GetNextSendSequence(NetworkRole.HOST, target));
+                byte[] serializedData = Serialize(packetType, message, GetNextSendSequence(NetworkRole.HOST, target));
                 if (serializedData == null) return;
                 _udpClient.Send(serializedData, serializedData.Length, target);
             }
@@ -161,7 +162,7 @@ namespace Network
             }
         }
 
-        public void SendByBroadcast<T>(PacketType type, T message) where T : IMessage<T>
+        public void SendToClientByBroadcast<T>(PacketType packetType, T message) where T : IMessage<T>
         {
             if (_udpClient == null) return;
 
@@ -171,12 +172,11 @@ namespace Network
                 return;
             }
 
-
             foreach (IPEndPoint target in _clientEndPoints.Keys)
             {
                 try
                 {
-                    byte[] serializedData = Serialize(type, message, GetNextSendSequence(NetworkRole.HOST, target));
+                    byte[] serializedData = Serialize(packetType, message, GetNextSendSequence(NetworkRole.HOST, target));
                     if (serializedData == null) continue;
                     _udpClient.Send(serializedData, serializedData.Length, target);
                 }
@@ -221,7 +221,7 @@ namespace Network
                                 {
                                     if (seq < packet.Sequence)
                                     {
-                                        _receivedPackets.Enqueue(new ReceivedPacket(packet, sender));
+                                        _receivedPackets.Enqueue(new ReceivedPacket(NetworkRole.CLIENT, packet, sender));
                                         return packet.Sequence;
                                     }
                                     return seq;
@@ -232,7 +232,7 @@ namespace Network
                         {
                             if (_clientReceivedHostLastSeq < packet.Sequence)
                             {
-                                _receivedPackets.Enqueue(new ReceivedPacket(packet, sender));
+                                _receivedPackets.Enqueue(new ReceivedPacket(NetworkRole.HOST, packet, sender));
                                 _clientReceivedHostLastSeq = packet.Sequence;
                             }
                         }
@@ -248,13 +248,13 @@ namespace Network
             }
         }
 
-        private byte[] Serialize<T>(PacketType type, T message, int seq) where T : IMessage<T>
+        private byte[] Serialize<T>(PacketType packetType, T message, int seq) where T : IMessage<T>
         {
             byte[] data = message.ToByteArray();
 
             NetworkPacket packet = new NetworkPacket()
             {
-                Type = type,
+                PacketType = packetType,
                 Sequence = seq,
                 Data = ByteString.CopyFrom(data)
             };
@@ -300,11 +300,13 @@ namespace Network
 
     public class ReceivedPacket
     {
+        public NetworkRole SenderType { get; set; }
         public NetworkPacket Packet { get; set; }
         public IPEndPoint Sender { get; set; }
 
-        public ReceivedPacket(NetworkPacket packet, IPEndPoint sender)
+        public ReceivedPacket(NetworkRole senderType, NetworkPacket packet, IPEndPoint sender)
         {
+            SenderType = senderType;
             Packet = packet;
             Sender = sender;
         }

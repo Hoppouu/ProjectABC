@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 
 namespace Network
@@ -7,8 +8,8 @@ namespace Network
     public class PacketHandlerBase
     {
         private Dictionary<PacketType, Action<NetworkPacket, IPEndPoint>> _handlerMap;
-
         protected PacketSender _packetSender;
+
         public PacketHandlerBase(PacketSender packetSender)
         {
             _packetSender = packetSender;
@@ -22,13 +23,13 @@ namespace Network
 
         public void RoutePacket(NetworkPacket packet, IPEndPoint sender)
         {
-            if (_handlerMap.TryGetValue(packet.Type, out Action<NetworkPacket, IPEndPoint> handler))
+            if (_handlerMap.TryGetValue(packet.PacketType, out Action<NetworkPacket, IPEndPoint> handler))
             {
                 handler.Invoke(packet, sender);
             }
             else
             {
-                Log.Error($"Unknown Packet Type: {packet.Type}");
+                Log.Error($"Unknown Packet Type: {packet.PacketType}");
             }
 
         }
@@ -36,23 +37,16 @@ namespace Network
 
     public class HostPacketHandler:PacketHandlerBase
     {
-        public event Action<IPEndPoint> OnJoinRequest;
+        //public event Action<IPEndPoint> OnJoinRequest;
         public HostPacketHandler(PacketSender packetSender) : base(packetSender)
         {
-            RegisterHandler(PacketType.C2HMove, HandleMove);
-            RegisterHandler(PacketType.C2HPlayerJoin, HandlePlayerJoin);
-            RegisterHandler(PacketType.C2HJoinRequest, HandleJoinRequest);
+            RegisterHandler(PacketType.PlayerInfo, HandlePlayerInfo);
+            RegisterHandler(PacketType.JoinRequest, HandleJoinRequest);
         }
 
-        private void HandleMove(NetworkPacket packet, IPEndPoint sender)
+        private void HandlePlayerInfo(NetworkPacket packet, IPEndPoint sender)
         {
             PlayerInfo playerInfo = PlayerInfo.Parser.ParseFrom(packet.Data);
-        }
-
-        private void HandlePlayerJoin(NetworkPacket packet, IPEndPoint sender)
-        {
-            PlayerInfoList playerInfoList = PlayerInfoList.Parser.ParseFrom(packet.Data);
-
         }
 
         private void HandleJoinRequest(NetworkPacket packet, IPEndPoint sender)
@@ -60,6 +54,7 @@ namespace Network
             PlayerInfo playerInfo = PlayerInfo.Parser.ParseFrom(packet.Data);
             int nextID = GameManager.Instance.GetNextPlayerID();
             GameManager.Instance.AddPlayer(nextID, false, sender);
+            //여기에 기존 플레이어 동기화 코드 추가해야함.
             _packetSender.Host.SendJoinResponse(nextID, GameManager.Instance.GetPlayers(), sender);
         }
 
@@ -68,38 +63,35 @@ namespace Network
     public class ClientPacketHandler : PacketHandlerBase
     {
 
-        public event Action<PlayerInfo> OnMove;
-        public event Action<PlayerInfoList> OnMoveSync;
-        public event Action<InteractResult> OnInteractionResult;
-        public event Action<GameState> OnGameStateChanged;
-        public event Action<int> OnJoinResponse;
-
         public ClientPacketHandler(PacketSender packetSender) : base(packetSender)
         {
-            RegisterHandler(PacketType.H2CMoveSync, HandleMoveSync);
-            RegisterHandler(PacketType.H2CPlayerJoinSync, HandlePlayerJoin);
-            RegisterHandler(PacketType.H2CJoinResponse, HandleJoinResponse);
+            RegisterHandler(PacketType.PlayerInfoList, HandlePlayerInfoList);
+            RegisterHandler(PacketType.JoinResponse, HandleJoinResponse);
         }
 
 
 
-        private void HandleMoveSync(NetworkPacket packet, IPEndPoint sender)
+        private void HandlePlayerInfoList(NetworkPacket packet, IPEndPoint sender)
         {
             PlayerInfoList playerInfoList = PlayerInfoList.Parser.ParseFrom(packet.Data);
-            OnMoveSync.Invoke(playerInfoList);
         }
 
-        private void HandlePlayerJoin(NetworkPacket packet, IPEndPoint sender)
-        {
-            PlayerInfoList playerInfoList = PlayerInfoList.Parser.ParseFrom(packet.Data);
-            //GameManager.Instance.CreatePlayerPrefab(false);
-        }
         private void HandleJoinResponse(NetworkPacket packet, IPEndPoint sender)
         {
-            PlayerInfo playerInfo = PlayerInfo.Parser.ParseFrom(packet.Data);
-            OnJoinResponse.Invoke(playerInfo.PlayerId);
+            PlayerInfoList playerInfoList = PlayerInfoList.Parser.ParseFrom(packet.Data);
+            int yourID = playerInfoList.YourID;
+
+            Log.Info(playerInfoList.List.Count.ToString());
+            foreach (PlayerInfo playerInfo in playerInfoList.List)
+            {
+                if (GameManager.Instance.IsExistPlayer(playerInfo.PlayerID)) continue;
+
+                if (yourID != playerInfo.PlayerID)  GameManager.Instance.AddPlayer(playerInfo.PlayerID, false);
+                else                                GameManager.Instance.AddPlayer(yourID, true);
+            }
         }
     }
+
     public class PacketHandler
     {
         public HostPacketHandler Host { get; }

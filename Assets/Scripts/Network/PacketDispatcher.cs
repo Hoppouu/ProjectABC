@@ -1,4 +1,5 @@
 using Network;
+using System.Collections;
 using UnityEngine;
 
 public class PacketDispatcher : MonoBehaviour
@@ -22,11 +23,17 @@ public class PacketDispatcher : MonoBehaviour
 
     public void TickProcessPacketQueue()
     {
-        //핸들러 타입 페이로드 추가해야함.
         while (_packetTransmitter.TryDequeuePacket(out ReceivedPacket receivedPacket))
         {
-            _packetHandler.Host.RoutePacket(receivedPacket.Packet, receivedPacket.Sender);
-            _packetHandler.Client.RoutePacket(receivedPacket.Packet, receivedPacket.Sender);
+            switch (receivedPacket.SenderType)
+            {
+                case NetworkRole.HOST:
+                    _packetHandler.Client.RoutePacket(receivedPacket.Packet, receivedPacket.Sender);
+                    break;
+                case NetworkRole.CLIENT:
+                    _packetHandler.Host.RoutePacket(receivedPacket.Packet, receivedPacket.Sender);
+                    break;
+            }
         }
     }
     void Update()

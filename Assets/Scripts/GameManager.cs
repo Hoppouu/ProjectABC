@@ -26,9 +26,9 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
     public GameObject prefab;
 
-    private Dictionary<int, PlayerEntry> players;
+    private Dictionary<int, PlayerEntry> _players;
     private int _nextPlayerID = 1;
-    
+    private int _next = 0;
     private void Awake()
     {
         if(Instance == null)
@@ -41,36 +41,32 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-    }
-
-    void Update()
-    {
-        players = new Dictionary<int, PlayerEntry>();
+        _players = new Dictionary<int, PlayerEntry>();
     }
 
     public void AddPlayer(int playerID, bool isMine, IPEndPoint ipEndPoint = null)
     {
-        players[playerID] = new PlayerEntry(playerID, CreatePlayerPrefab(isMine), ipEndPoint);
-    }
-
-    private GameObject CreatePlayerPrefab(bool isMine)
-    {
-        GameObject gameObject = Instantiate(prefab);
-        gameObject.GetComponent<PlayerInput>().isMine = isMine;
-
-        return gameObject;
+        _players[playerID] = new PlayerEntry(playerID, CreatePlayerPrefab(isMine), ipEndPoint);
     }
 
     public List<PlayerEntry> GetPlayers()
     {
-        List<PlayerEntry> list = new List<PlayerEntry>();
-        foreach(PlayerEntry player in players.Values)
-        {
-            list.Add(player);
-        }
+        return new List<PlayerEntry>(_players.Values);
+    }
 
-        return list;
+    public bool IsExistPlayer(int playerID)
+    {
+        return _players.ContainsKey(playerID);
     }
 
     public int GetNextPlayerID() { return _nextPlayerID++; }
+
+
+    private GameObject CreatePlayerPrefab(bool isMine)
+    {
+        GameObject gameObject = Instantiate(prefab, new Vector3( -4 + _next++ * 2, 1, 0), Quaternion.identity);
+        gameObject.GetComponent<PlayerInput>().isMine = isMine;
+
+        return gameObject;
+    }
 }
