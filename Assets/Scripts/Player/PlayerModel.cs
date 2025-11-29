@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerModel : MonoBehaviour
 {
     public Transform headPos;
-
+    public InputHandler inputHandler;
     void Start()
     {
     }

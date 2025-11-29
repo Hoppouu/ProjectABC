@@ -1,53 +1,56 @@
 using UnityEngine;
+using UnityEngine.LowLevel;
 
 public class CameraController : MonoBehaviour
 {
     public PlayerModel playerModel;
     public Vector3 viewOffset;
+    private Vector2 _inputDelta;
     public float mouseSensitivity = 2f;
-
-    private float _mouseX;
-    private float _mouseY;
+    public float smoothSpeed = 20f;
     private float _currentXRotation;
 
-    void HandleInput(Vector2 input)
+    private void OnEnable()
     {
-        _mouseX = input.x * mouseSensitivity;
-        _mouseY = input.y * mouseSensitivity;
+        playerModel.inputHandler.OnMouseInput += HandleLookInput;
     }
-
-    // [1] 몸통 회전은 Update (애니메이션보다 먼저)
-    void Update()
+    private void HandleLookInput(Vector2 input)
     {
-        if (playerModel.transform != null && Mathf.Abs(_mouseX) > 0.001f)
-        {
-            playerModel.transform.Rotate(Vector3.up * _mouseX);
-        }
+        _inputDelta = input;
     }
 
     void LateUpdate()
     {
-        if (playerModel.transform == null || playerModel.headPos == null) return;
+        if (playerModel == null || playerModel.headPos == null) return;
+        Vector3 stablePosition = playerModel.transform.position;
+        float bobbingHeight = playerModel.headPos.position.y; 
 
-        // --- 회전 (즉시 반응 유지) ---
-        _currentXRotation -= _mouseY;
-        _currentXRotation = Mathf.Clamp(_currentXRotation, -90f, 90f);
-        transform.rotation = Quaternion.Euler(_currentXRotation, playerModel.transform.eulerAngles.y, 0f);
+        // 최종 카메라 위치 조합
+        Vector3 targetWorldPos = new Vector3(stablePosition.x, bobbingHeight, stablePosition.z);
 
-        // --- 위치 (노이즈 필터링 적용) ---
-        Vector3 rootPos = playerModel.transform.position;
-        float rawHeadHeight = playerModel.headPos.position.y; // 덜덜 떨리는 좀비 머리 높이
+        // 오프셋 적용 (회전 방향 고려)
+        // 주의: headBone.rotation을 쓰면 머리 돌릴 때 카메라도 돌아가므로 playerRoot의 회전을 기준 잡음
+        Vector3 finalPos = targetWorldPos + (playerModel.transform.rotation * viewOffset);
 
-        // [핵심 해결책] 현재 카메라 높이와 목표 높이(머리) 사이를 부드럽게 보간
-        // Time.deltaTime * 15f 정도면 꿀렁임은 따라가되, 미세한 떨림은 무시합니다.
-        float smoothedHeight = Mathf.Lerp(transform.position.y, rawHeadHeight, 15f * Time.deltaTime);
+        // 카메라 위치 확정
+        transform.position = finalPos;
 
-        // X, Z는 몸통(안정적), Y는 부드럽게 처리된 높이 사용
-        Vector3 finalPos = new Vector3(rootPos.x, smoothedHeight, rootPos.z);
 
-        // 오프셋 적용
-        transform.position = finalPos + (transform.rotation * viewOffset);
+        // --- 회전 로직 (기존과 동일) ---
+        if (_inputDelta.sqrMagnitude >= 0.001f)
+        {
+            float mouseX = _inputDelta.x * mouseSensitivity;
+            float mouseY = _inputDelta.y * mouseSensitivity;
 
-        _mouseX = 0; _mouseY = 0;
+            _currentXRotation -= mouseY;
+            _currentXRotation = Mathf.Clamp(_currentXRotation, -90f, 90f);
+
+            // 몸통 회전
+            playerModel.transform.Rotate(Vector3.up * mouseX);
+            _inputDelta = Vector2.zero;
+        }
+
+        Quaternion targetRotation = Quaternion.Euler(_currentXRotation, playerModel.transform.eulerAngles.y, 0f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, smoothSpeed * Time.deltaTime);
     }
 }

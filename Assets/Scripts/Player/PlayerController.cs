@@ -4,6 +4,7 @@ public class PlayerController : MonoBehaviour
 {
     private Rigidbody _playerRigid;
     private Animator _animator;
+    private PlayerModel _playerModel;
     public LayerMask groundLayer;
     public float playerHeight;
     public float moveSpeed = 1.0f;
@@ -13,7 +14,13 @@ public class PlayerController : MonoBehaviour
     void OnEnable()
     {
         _playerRigid = GetComponent<Rigidbody>();
+        _playerModel = GetComponent<PlayerModel>();
         _animator = GetComponent<Animator>();
+        _playerModel.inputHandler = GetComponent<InputHandler>();
+        _playerModel.inputHandler.OnWalkInput += Walk;
+        _playerModel.inputHandler.OnRunInput += Run;
+        _playerModel.inputHandler.OnJumpInput += Jump;
+        _playerModel.inputHandler.OnMouseInput += RotateBody;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }

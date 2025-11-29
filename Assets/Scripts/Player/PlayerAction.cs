@@ -4,7 +4,7 @@ using Network;
 public class PlayerAction : MonoBehaviour
 {
     public int playerID;
-    PlayerModel playerModel;
+    PlayerModel _playerModel;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
