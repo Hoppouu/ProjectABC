@@ -17,13 +17,13 @@ namespace Network
         {
             return new Vec3 { X = vector.x, Y = vector.y, Z = vector.z };
         }
-        protected PlayerInfo ToPlayerInfo(PlayerEntry playerEntry)
+        protected PlayerInfo ToPlayerInfo(PlayerModel playerModel)
         {
             Network.PlayerInfo playerInfo = new Network.PlayerInfo()
             {
-                PlayerID = playerEntry.id,
-                Position = ToVec3(playerEntry.gameObject.transform.position),
-                Rotation = ToVec3(playerEntry.gameObject.transform.rotation.eulerAngles)
+                PlayerID = playerModel.PlayerID,
+                Position = ToVec3(playerModel.playerPosition),
+                Rotation = ToVec3(playerModel.playerRotation)
             };
 
             return playerInfo;
@@ -36,7 +36,7 @@ namespace Network
             playerInfoList.YourID = playerID;
             foreach (PlayerEntry playerEntry in playerEntries)
             {
-                playerInfoList.List.Add(ToPlayerInfo(playerEntry));
+                playerInfoList.List.Add(ToPlayerInfo(playerEntry.playerModel));
             }
 
             return playerInfoList;
@@ -47,7 +47,7 @@ namespace Network
     {
         public HostPacketSender(PacketTransmitter packetTransmitter) : base(packetTransmitter) { }
 
-        public void BroadcastPlayersInfo(List<PlayerEntry> players)
+        public void BroadcastPlayerInfoList(List<PlayerEntry> players)
         {
             if (!_packetTransmitter.IsHost) throw new System.InvalidOperationException("PlayerMoveSync should only be called by the host");
 
@@ -56,7 +56,12 @@ namespace Network
 
         public void SendJoinResponse(int playerID, List<PlayerEntry> palyers, IPEndPoint target)
         {
-            _packetTransmitter.SendToClientByBroadcast(PacketType.JoinResponse, ToPlayerInfoList(playerID, palyers));
+            _packetTransmitter.SendToClient(PacketType.JoinResponse, ToPlayerInfoList(playerID, palyers), target);
+        }
+
+        public void SendJoinResponseByBroadcast(List<PlayerEntry> palyers)
+        {
+            _packetTransmitter.SendToClientByBroadcast(PacketType.JoinResponse, ToPlayerInfoList(0, palyers));
         }
     }
 
@@ -64,9 +69,9 @@ namespace Network
     {
         public ClientPacketSender(PacketTransmitter packetTransmitter) : base(packetTransmitter) { }
 
-        public void SendPlayerInfo(PlayerEntry playerEntry)
+        public void SendPlayerInfo(PlayerModel playerModel)
         {
-            _packetTransmitter.SendToHost(PacketType.PlayerInfo, ToPlayerInfo(playerEntry));
+            _packetTransmitter.SendToHost(PacketType.PlayerInfo, ToPlayerInfo(playerModel));
         }
         public void SendJoinRequest()
         {

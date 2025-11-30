@@ -5,8 +5,13 @@ using Network;
 public class NetworkManager : MonoBehaviour
 {
     public static NetworkManager Instance { get; private set; }
-    public PacketDispatcher packetDispatcher;
 
+    public HostPacketSender HostSender => _packetDispatcher.HostSender;
+    public ClientPacketSender ClientSender => _packetDispatcher.ClientSender;
+    public HostPacketHandler HostHandler => _packetDispatcher.HostHandler;
+    public ClientPacketHandler ClientHandler => _packetDispatcher.ClientHandler;
+
+    private PacketDispatcher _packetDispatcher;
 
     private void Awake()
     {
@@ -20,18 +25,20 @@ public class NetworkManager : MonoBehaviour
             Destroy(this.gameObject);
             return;
         }
+
+        _packetDispatcher = GetComponent<PacketDispatcher>();
     }
 
     public void StartAsHost()
     {
-        packetDispatcher.Setup(NetworkRole.HOST);
-        GameManager.Instance.AddPlayer(GameManager.Instance.GetNextPlayerID(), true);
+        _packetDispatcher.Setup(NetworkRole.Host);
+        GameManager.Instance.AddPlayer(new PlayerModel(GameManager.Instance.GetNextPlayerID(), true));
     }
 
     public void StartAsClient(string hostIp)
     {
-        packetDispatcher.Setup(NetworkRole.CLIENT, hostIp);
-        packetDispatcher.ClientSender.SendJoinRequest();
+        _packetDispatcher.Setup(NetworkRole.Client, hostIp);
+        _packetDispatcher.ClientSender.SendJoinRequest();
     }
 
 }

@@ -8,15 +8,21 @@ namespace Manager
 {
     public class PlayerEntry
     {
-        public int id;
-        public IPEndPoint ipEndPoint;
-        public GameObject gameObject;
+        public readonly GameObject gameObject;
+        public readonly PlayerModel playerModel;
+        public readonly IPEndPoint ipEndPoint;
 
-        public PlayerEntry(int id, GameObject gameObject, IPEndPoint ipEndPoint)
+        public PlayerEntry(GameObject gameObject, PlayerModel playerModel, IPEndPoint ipEndPoint)
         {
-            this.id = id;
-            this.ipEndPoint = ipEndPoint;
             this.gameObject = gameObject;
+            this.playerModel = playerModel;
+            this.ipEndPoint = ipEndPoint;
+        }
+
+        public void SetModel(PlayerModel playerModel)
+        {
+            this.playerModel.playerPosition = playerModel.playerPosition;
+            this.playerModel.playerRotation = playerModel.playerRotation;
         }
     }
 }
@@ -44,14 +50,24 @@ public class GameManager : MonoBehaviour
         _players = new Dictionary<int, PlayerEntry>();
     }
 
-    public void AddPlayer(int playerID, bool isMine, IPEndPoint ipEndPoint = null)
+    public void AddPlayer(PlayerModel playerModel, IPEndPoint ipEndPoint = null)
     {
-        _players[playerID] = new PlayerEntry(playerID, CreatePlayerPrefab(isMine), ipEndPoint);
+        _players[playerModel.PlayerID] = new PlayerEntry(CreatePlayerPrefab(), playerModel, ipEndPoint);
+        playerModel.playerPosition = new Vector3(-4 + _next++ * 2, 1, 0);
+        playerModel.playerRotation = Vector3.zero;
+        _players[playerModel.PlayerID].gameObject.GetComponent<PlayerRoot>().Initiate(playerModel);
     }
 
     public List<PlayerEntry> GetPlayers()
     {
         return new List<PlayerEntry>(_players.Values);
+    }
+
+    public bool SetPlayers(PlayerModel playerModel)
+    {
+        if (!_players.ContainsKey(playerModel.PlayerID)) return false;
+        _players[playerModel.PlayerID].SetModel(playerModel);
+        return true;
     }
 
     public bool IsExistPlayer(int playerID)
@@ -62,11 +78,8 @@ public class GameManager : MonoBehaviour
     public int GetNextPlayerID() { return _nextPlayerID++; }
 
 
-    private GameObject CreatePlayerPrefab(bool isMine)
+    private GameObject CreatePlayerPrefab()
     {
-        GameObject gameObject = Instantiate(prefab, new Vector3( -4 + _next++ * 2, 1, 0), Quaternion.identity);
-        gameObject.GetComponent<PlayerInput>().isMine = isMine;
-
-        return gameObject;
+        return Instantiate(prefab);
     }
 }

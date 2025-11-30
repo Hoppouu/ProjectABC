@@ -29,20 +29,22 @@ namespace Network {
             "SW5mbxIQCghwbGF5ZXJJRBgBIAEoBRIfCghwb3NpdGlvbhgCIAEoCzINLk5l",
             "dHdvcmsuVmVjMxIfCghyb3RhdGlvbhgDIAEoCzINLk5ldHdvcmsuVmVjMyJD",
             "Cg5QbGF5ZXJJbmZvTGlzdBIOCgZ5b3VySUQYASABKAUSIQoEbGlzdBgCIAMo",
-            "CzITLk5ldHdvcmsuUGxheWVySW5mbyJZCg1OZXR3b3JrUGFja2V0EigKC3Bh",
-            "Y2tldF90eXBlGAIgASgOMhMuTmV0d29yay5QYWNrZXRUeXBlEhAKCHNlcXVl",
-            "bmNlGAMgASgFEgwKBGRhdGEYBCABKAwqcQoKUGFja2V0VHlwZRIXChNQQUNL",
-            "RVRfVFlQRV9VTktOT1dOEAASDwoLUExBWUVSX0lORk8QARIUChBQTEFZRVJf",
-            "SU5GT19MSVNUEAISEAoMSk9JTl9SRVFVRVNUEBASEQoNSk9JTl9SRVNQT05T",
-            "RRARYgZwcm90bzM="));
+            "CzITLk5ldHdvcmsuUGxheWVySW5mbyKEAQoNTmV0d29ya1BhY2tldBIpCgtz",
+            "ZW5kZXJfdHlwZRgBIAEoDjIULk5ldHdvcmsuTmV0d29ya1JvbGUSKAoLcGFj",
+            "a2V0X3R5cGUYAiABKA4yEy5OZXR3b3JrLlBhY2tldFR5cGUSEAoIc2VxdWVu",
+            "Y2UYAyABKAUSDAoEZGF0YRgEIAEoDCpxCgpQYWNrZXRUeXBlEhcKE1BBQ0tF",
+            "VF9UWVBFX1VOS05PV04QABIPCgtQTEFZRVJfSU5GTxABEhQKEFBMQVlFUl9J",
+            "TkZPX0xJU1QQAhIQCgxKT0lOX1JFUVVFU1QQEBIRCg1KT0lOX1JFU1BPTlNF",
+            "EBEqPAoLTmV0d29ya1JvbGUSFwoTU0VOREVSX1RZUEVfVU5LTk9XThAAEggK",
+            "BEhPU1QQARIKCgZDTElFTlQQAmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Network.PacketType), }, null, new pbr::GeneratedClrTypeInfo[] {
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Network.PacketType), typeof(global::Network.NetworkRole), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Network.Empty), global::Network.Empty.Parser, null, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Network.Vec3), global::Network.Vec3.Parser, new[]{ "X", "Y", "Z" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Network.PlayerInfo), global::Network.PlayerInfo.Parser, new[]{ "PlayerID", "Position", "Rotation" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Network.PlayerInfoList), global::Network.PlayerInfoList.Parser, new[]{ "YourID", "List" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Network.NetworkPacket), global::Network.NetworkPacket.Parser, new[]{ "PacketType", "Sequence", "Data" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Network.NetworkPacket), global::Network.NetworkPacket.Parser, new[]{ "SenderType", "PacketType", "Sequence", "Data" }, null, null, null, null)
           }));
     }
     #endregion
@@ -55,6 +57,12 @@ namespace Network {
     [pbr::OriginalName("PLAYER_INFO_LIST")] PlayerInfoList = 2,
     [pbr::OriginalName("JOIN_REQUEST")] JoinRequest = 16,
     [pbr::OriginalName("JOIN_RESPONSE")] JoinResponse = 17,
+  }
+
+  public enum NetworkRole {
+    [pbr::OriginalName("SENDER_TYPE_UNKNOWN")] SenderTypeUnknown = 0,
+    [pbr::OriginalName("HOST")] Host = 1,
+    [pbr::OriginalName("CLIENT")] Client = 2,
   }
 
   #endregion
@@ -1042,6 +1050,7 @@ namespace Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public NetworkPacket(NetworkPacket other) : this() {
+      senderType_ = other.senderType_;
       packetType_ = other.packetType_;
       sequence_ = other.sequence_;
       data_ = other.data_;
@@ -1052,6 +1061,18 @@ namespace Network {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public NetworkPacket Clone() {
       return new NetworkPacket(this);
+    }
+
+    /// <summary>Field number for the "sender_type" field.</summary>
+    public const int SenderTypeFieldNumber = 1;
+    private global::Network.NetworkRole senderType_ = global::Network.NetworkRole.SenderTypeUnknown;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Network.NetworkRole SenderType {
+      get { return senderType_; }
+      set {
+        senderType_ = value;
+      }
     }
 
     /// <summary>Field number for the "packet_type" field.</summary>
@@ -1105,6 +1126,7 @@ namespace Network {
       if (ReferenceEquals(other, this)) {
         return true;
       }
+      if (SenderType != other.SenderType) return false;
       if (PacketType != other.PacketType) return false;
       if (Sequence != other.Sequence) return false;
       if (Data != other.Data) return false;
@@ -1115,6 +1137,7 @@ namespace Network {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
+      if (SenderType != global::Network.NetworkRole.SenderTypeUnknown) hash ^= SenderType.GetHashCode();
       if (PacketType != global::Network.PacketType.Unknown) hash ^= PacketType.GetHashCode();
       if (Sequence != 0) hash ^= Sequence.GetHashCode();
       if (Data.Length != 0) hash ^= Data.GetHashCode();
@@ -1136,6 +1159,10 @@ namespace Network {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
+      if (SenderType != global::Network.NetworkRole.SenderTypeUnknown) {
+        output.WriteRawTag(8);
+        output.WriteEnum((int) SenderType);
+      }
       if (PacketType != global::Network.PacketType.Unknown) {
         output.WriteRawTag(16);
         output.WriteEnum((int) PacketType);
@@ -1158,6 +1185,10 @@ namespace Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (SenderType != global::Network.NetworkRole.SenderTypeUnknown) {
+        output.WriteRawTag(8);
+        output.WriteEnum((int) SenderType);
+      }
       if (PacketType != global::Network.PacketType.Unknown) {
         output.WriteRawTag(16);
         output.WriteEnum((int) PacketType);
@@ -1180,6 +1211,9 @@ namespace Network {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
+      if (SenderType != global::Network.NetworkRole.SenderTypeUnknown) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) SenderType);
+      }
       if (PacketType != global::Network.PacketType.Unknown) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) PacketType);
       }
@@ -1200,6 +1234,9 @@ namespace Network {
     public void MergeFrom(NetworkPacket other) {
       if (other == null) {
         return;
+      }
+      if (other.SenderType != global::Network.NetworkRole.SenderTypeUnknown) {
+        SenderType = other.SenderType;
       }
       if (other.PacketType != global::Network.PacketType.Unknown) {
         PacketType = other.PacketType;
@@ -1229,6 +1266,10 @@ namespace Network {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
+          case 8: {
+            SenderType = (global::Network.NetworkRole) input.ReadEnum();
+            break;
+          }
           case 16: {
             PacketType = (global::Network.PacketType) input.ReadEnum();
             break;
@@ -1260,6 +1301,10 @@ namespace Network {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
+          case 8: {
+            SenderType = (global::Network.NetworkRole) input.ReadEnum();
+            break;
+          }
           case 16: {
             PacketType = (global::Network.PacketType) input.ReadEnum();
             break;

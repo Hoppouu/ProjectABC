@@ -1,16 +1,23 @@
 using UnityEngine;
 
-public class PlayerModel : MonoBehaviour
+public class PlayerModel
 {
     public Transform headPos;
+    public Vector3 playerPosition;
+    public Vector3 playerRotation;
+    private Vector3 _headPosition;
+    private Vector3 _headRotation;
 
-    void Start()
+    public int PlayerID { get; private set; }
+    public bool IsMine { get; private set; }
+
+    public PlayerModel(int playerID)
     {
+        this.PlayerID = playerID;
     }
-
-    // Update is called once per frame
-    void Update()
+    public PlayerModel(int playerID, bool isMine)
     {
-        
+        PlayerID = playerID;
+        IsMine = isMine;
     }
 }

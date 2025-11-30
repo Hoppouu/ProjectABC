@@ -243,7 +243,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 745edd7cbfe1e8641a64a9d4b9452c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  packetDispatcher: {fileID: 70660867}
 --- !u!114 &70660867
 MonoBehaviour:
   m_ObjectHideFlags: 0

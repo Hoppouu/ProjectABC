@@ -1,5 +1,4 @@
 using Network;
-using System.Collections;
 using UnityEngine;
 
 public class PacketDispatcher : MonoBehaviour
@@ -25,12 +24,12 @@ public class PacketDispatcher : MonoBehaviour
     {
         while (_packetTransmitter.TryDequeuePacket(out ReceivedPacket receivedPacket))
         {
-            switch (receivedPacket.SenderType)
+            switch (receivedPacket.Packet.SenderType)
             {
-                case NetworkRole.HOST:
+                case NetworkRole.Host:
                     _packetHandler.Client.RoutePacket(receivedPacket.Packet, receivedPacket.Sender);
                     break;
-                case NetworkRole.CLIENT:
+                case NetworkRole.Client:
                     _packetHandler.Host.RoutePacket(receivedPacket.Packet, receivedPacket.Sender);
                     break;
             }
@@ -40,6 +39,7 @@ public class PacketDispatcher : MonoBehaviour
     {
         if (_packetTransmitter == null || _packetHandler == null) return;
         TickProcessPacketQueue();
+        if (_packetTransmitter.IsHost) HostSender.BroadcastPlayerInfoList(GameManager.Instance.GetPlayers());
     }
 
     private void OnDestroy()

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
+using UnityEngine;
 
 namespace Network
 {
@@ -31,7 +31,20 @@ namespace Network
             {
                 Log.Error($"Unknown Packet Type: {packet.PacketType}");
             }
+        }
 
+        protected Vector3 ToVector3(Vec3 vec3)
+        {
+            return new Vector3(vec3.X, vec3.Y, vec3.Z);
+        }
+
+        protected PlayerModel ToPlayerModel(PlayerInfo playerInfo)
+        {
+            PlayerModel playerModel = new PlayerModel(playerInfo.PlayerID);
+            playerModel.playerPosition = ToVector3(playerInfo.Position);
+            playerModel.playerRotation = ToVector3(playerInfo.Rotation);
+
+            return playerModel;
         }
     }
 
@@ -47,15 +60,16 @@ namespace Network
         private void HandlePlayerInfo(NetworkPacket packet, IPEndPoint sender)
         {
             PlayerInfo playerInfo = PlayerInfo.Parser.ParseFrom(packet.Data);
+            GameManager.Instance.SetPlayers(ToPlayerModel(playerInfo));
         }
 
         private void HandleJoinRequest(NetworkPacket packet, IPEndPoint sender)
         {
             PlayerInfo playerInfo = PlayerInfo.Parser.ParseFrom(packet.Data);
             int nextID = GameManager.Instance.GetNextPlayerID();
-            GameManager.Instance.AddPlayer(nextID, false, sender);
-            //여기에 기존 플레이어 동기화 코드 추가해야함.
+            GameManager.Instance.AddPlayer(new PlayerModel(nextID, false), sender);
             _packetSender.Host.SendJoinResponse(nextID, GameManager.Instance.GetPlayers(), sender);
+            _packetSender.Host.SendJoinResponseByBroadcast(GameManager.Instance.GetPlayers());
         }
 
     }
@@ -74,20 +88,24 @@ namespace Network
         private void HandlePlayerInfoList(NetworkPacket packet, IPEndPoint sender)
         {
             PlayerInfoList playerInfoList = PlayerInfoList.Parser.ParseFrom(packet.Data);
+
+            foreach (PlayerInfo playerInfo in playerInfoList.List)
+            {
+                GameManager.Instance.SetPlayers(ToPlayerModel(playerInfo));
+            }
         }
 
         private void HandleJoinResponse(NetworkPacket packet, IPEndPoint sender)
         {
             PlayerInfoList playerInfoList = PlayerInfoList.Parser.ParseFrom(packet.Data);
             int yourID = playerInfoList.YourID;
-
-            Log.Info(playerInfoList.List.Count.ToString());
             foreach (PlayerInfo playerInfo in playerInfoList.List)
             {
                 if (GameManager.Instance.IsExistPlayer(playerInfo.PlayerID)) continue;
-
-                if (yourID != playerInfo.PlayerID)  GameManager.Instance.AddPlayer(playerInfo.PlayerID, false);
-                else                                GameManager.Instance.AddPlayer(yourID, true);
+                
+                //브로드캐스트일 땐 yourID = 0 이다.
+                if (yourID != playerInfo.PlayerID)  GameManager.Instance.AddPlayer(new PlayerModel(playerInfo.PlayerID, false));
+                else                                GameManager.Instance.AddPlayer(new PlayerModel(yourID, true));
             }
         }
     }

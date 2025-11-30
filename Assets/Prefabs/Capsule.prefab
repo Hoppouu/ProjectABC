@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 979996271541824224}
   - component: {fileID: 2544029309020420868}
   - component: {fileID: 4479519569912753247}
+  - component: {fileID: 903413352990432239}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Untagged
@@ -127,7 +128,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d84bc6ef4840f624ba28386feac61bf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInput
-  isMine: 0
 --- !u!114 &4479519569912753247
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -141,3 +141,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAction
   playerID: 0
+--- !u!114 &903413352990432239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8396247705687107243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c038781911fb48a4da5bc3059db2fed4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  materials:
+  - {fileID: 2100000, guid: 2f3e47f2da47a6e4bb4f95bda8192ee8, type: 2}
+  - {fileID: 2100000, guid: de08888d450a1b34c99ad5cbc2101408, type: 2}

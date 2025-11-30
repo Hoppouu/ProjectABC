@@ -10,12 +10,6 @@ using UnityEditor.Rendering;
 
 namespace Network
 {
-    public enum NetworkRole
-    {
-        HOST,
-        CLIENT
-    }
-
     public class PacketTransmitter : IDisposable
     {
         public bool IsHost { get; private set; }
@@ -44,11 +38,11 @@ namespace Network
 
             switch (role)
             {
-                case NetworkRole.HOST:
+                case NetworkRole.Host:
                     StartAsHost();
                     break;
 
-                case NetworkRole.CLIENT:
+                case NetworkRole.Client:
                     if (String.IsNullOrEmpty(hostIP)) throw new ArgumentException("Client role requires a valid host IP");
                     StartAsClient(hostIP);
                     break;
@@ -131,7 +125,7 @@ namespace Network
 
             try
             {
-                byte[] serializedData = Serialize(packetType, message, GetNextSendSequence(NetworkRole.CLIENT));
+                byte[] serializedData = Serialize(NetworkRole.Client, packetType, message, GetNextSendSequence(NetworkRole.Client));
                 if (serializedData == null) return;
                 _udpClient.Send(serializedData, serializedData.Length, _hostEndPoint);
             }
@@ -152,7 +146,7 @@ namespace Network
             }
             try
             {
-                byte[] serializedData = Serialize(packetType, message, GetNextSendSequence(NetworkRole.HOST, target));
+                byte[] serializedData = Serialize(NetworkRole.Host, packetType, message, GetNextSendSequence(NetworkRole.Host, target));
                 if (serializedData == null) return;
                 _udpClient.Send(serializedData, serializedData.Length, target);
             }
@@ -176,7 +170,7 @@ namespace Network
             {
                 try
                 {
-                    byte[] serializedData = Serialize(packetType, message, GetNextSendSequence(NetworkRole.HOST, target));
+                    byte[] serializedData = Serialize(NetworkRole.Host, packetType, message, GetNextSendSequence(NetworkRole.Host, target));
                     if (serializedData == null) continue;
                     _udpClient.Send(serializedData, serializedData.Length, target);
                 }
@@ -221,7 +215,7 @@ namespace Network
                                 {
                                     if (seq < packet.Sequence)
                                     {
-                                        _receivedPackets.Enqueue(new ReceivedPacket(NetworkRole.CLIENT, packet, sender));
+                                        _receivedPackets.Enqueue(new ReceivedPacket(packet, sender));
                                         return packet.Sequence;
                                     }
                                     return seq;
@@ -232,7 +226,7 @@ namespace Network
                         {
                             if (_clientReceivedHostLastSeq < packet.Sequence)
                             {
-                                _receivedPackets.Enqueue(new ReceivedPacket(NetworkRole.HOST, packet, sender));
+                                _receivedPackets.Enqueue(new ReceivedPacket(packet, sender));
                                 _clientReceivedHostLastSeq = packet.Sequence;
                             }
                         }
@@ -248,12 +242,13 @@ namespace Network
             }
         }
 
-        private byte[] Serialize<T>(PacketType packetType, T message, int seq) where T : IMessage<T>
+        private byte[] Serialize<T>(NetworkRole senderType, PacketType packetType, T message, int seq) where T : IMessage<T>
         {
             byte[] data = message.ToByteArray();
 
             NetworkPacket packet = new NetworkPacket()
             {
+                SenderType = senderType,
                 PacketType = packetType,
                 Sequence = seq,
                 Data = ByteString.CopyFrom(data)
@@ -284,7 +279,7 @@ namespace Network
         {
             return role switch
             {
-                NetworkRole.CLIENT => System.Threading.Interlocked.Increment(ref _clientSendHostLastSeq),
+                NetworkRole.Client => System.Threading.Interlocked.Increment(ref _clientSendHostLastSeq),
                 _ => throw new ArgumentOutOfRangeException(nameof(role), "Invalid NetworkRole in GetNextSendSequence")
             };
         }
@@ -292,7 +287,7 @@ namespace Network
         {
             return role switch
             {
-                NetworkRole.HOST => _hostSendClientLastSeq.AddOrUpdate(target, 0, (_, seq) => seq + 1),
+                NetworkRole.Host => _hostSendClientLastSeq.AddOrUpdate(target, 0, (_, seq) => seq + 1),
                 _ => throw new ArgumentOutOfRangeException(nameof(role), "Invalid NetworkRole in GetNextSendSequence")
             };
         }
@@ -300,13 +295,11 @@ namespace Network
 
     public class ReceivedPacket
     {
-        public NetworkRole SenderType { get; set; }
         public NetworkPacket Packet { get; set; }
         public IPEndPoint Sender { get; set; }
 
-        public ReceivedPacket(NetworkRole senderType, NetworkPacket packet, IPEndPoint sender)
+        public ReceivedPacket(NetworkPacket packet, IPEndPoint sender)
         {
-            SenderType = senderType;
             Packet = packet;
             Sender = sender;
         }
