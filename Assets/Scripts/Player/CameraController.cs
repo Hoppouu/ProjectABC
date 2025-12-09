@@ -3,16 +3,29 @@ using UnityEngine.LowLevel;
 
 public class CameraController : MonoBehaviour
 {
-    public PlayerModel playerModel;
-    public Vector3 viewOffset;
+    private PlayerRoot _playerRoot;
+    private PlayerInput _playerInput;
     private Vector2 _inputDelta;
     public float mouseSensitivity = 2f;
     public float smoothSpeed = 20f;
     private float _currentXRotation;
 
-    private void OnEnable()
+    private void Awake()
     {
-        playerModel.inputHandler.OnMouseInput += HandleLookInput;
+        _playerRoot = GetComponentInParent<PlayerRoot>();
+        _playerInput = GetComponentInParent<PlayerInput>();
+    }
+
+    private void Start()
+    {
+        if (_playerRoot.Model.isMine)
+        {
+            _playerInput.OnMouseInput += HandleLookInput;
+        }
+        else if (!_playerRoot.Model.isMine)
+        {
+
+        }
     }
     private void HandleLookInput(Vector2 input)
     {
@@ -21,19 +34,14 @@ public class CameraController : MonoBehaviour
 
     void LateUpdate()
     {
-        if (playerModel == null || playerModel.headPos == null) return;
-        Vector3 stablePosition = playerModel.transform.position;
-        float bobbingHeight = playerModel.headPos.position.y; 
+        if (_playerRoot == null || _playerRoot.headTransform == null) return;
+        Vector3 stablePosition = _playerRoot.playerTransform.position;
+        float bobbingHeight = _playerRoot.headTransform.position.y; 
 
-        // 최종 카메라 위치 조합
         Vector3 targetWorldPos = new Vector3(stablePosition.x, bobbingHeight, stablePosition.z);
 
-        // 오프셋 적용 (회전 방향 고려)
-        // 주의: headBone.rotation을 쓰면 머리 돌릴 때 카메라도 돌아가므로 playerRoot의 회전을 기준 잡음
-        Vector3 finalPos = targetWorldPos + (playerModel.transform.rotation * viewOffset);
-
         // 카메라 위치 확정
-        transform.position = finalPos;
+        transform.position = targetWorldPos;
 
 
         // --- 회전 로직 (기존과 동일) ---
@@ -46,11 +54,20 @@ public class CameraController : MonoBehaviour
             _currentXRotation = Mathf.Clamp(_currentXRotation, -90f, 90f);
 
             // 몸통 회전
-            playerModel.transform.Rotate(Vector3.up * mouseX);
+            _playerRoot.playerTransform.Rotate(Vector3.up * mouseX);
             _inputDelta = Vector2.zero;
         }
 
-        Quaternion targetRotation = Quaternion.Euler(_currentXRotation, playerModel.transform.eulerAngles.y, 0f);
+        Quaternion targetRotation = Quaternion.Euler(_currentXRotation, _playerRoot.playerTransform.eulerAngles.y, 0f);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, smoothSpeed * Time.deltaTime);
+    }
+    void SetLayerRecursively(GameObject obj, int newLayer)
+    {
+        if (obj == null) return;
+        obj.layer = newLayer;
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerRecursively(child.gameObject, newLayer);
+        }
     }
 }

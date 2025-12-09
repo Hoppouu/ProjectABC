@@ -25,21 +25,21 @@ public class NetworkManager : MonoBehaviour
     private void OnJoinRequest(IPEndPoint sender)
     {
         packetDispatcher.PacketSender.JoinResponse(_nextPlayerID, sender);
-        GameManager.Instance.AddPlayer(_nextPlayerID, sender, false);
+        GameManager.Instance.AddPlayer(_nextPlayerID, false, sender);
         _nextPlayerID++;
     }
 
     public void StartAsHost()
     {
         packetDispatcher.Setup(NetworkRole.HOST);
-        GameManager.Instance.CreatePlayerPrefab(true);
+        GameManager.Instance.CreatePlayerPrefab();
         packetDispatcher.PacketHandler.OnJoinRequest += OnJoinRequest;
     }
 
     public void StartAsClient(string hostIp)
     {
         packetDispatcher.Setup(NetworkRole.CLIENT, hostIp);
-        packetDispatcher.PacketHandler.OnJoinResponse += (int id) => { GameManager.Instance.CreatePlayerPrefab(true); };
+        packetDispatcher.PacketHandler.OnJoinResponse += (int id) => { GameManager.Instance.CreatePlayerPrefab(); };
         packetDispatcher.PacketSender.JoinRequest();
     }
 

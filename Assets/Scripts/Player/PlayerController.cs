@@ -2,63 +2,67 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    private PlayerRoot _playerRoot;
     private Rigidbody _playerRigid;
     private Animator _animator;
-    private PlayerModel _playerModel;
+    private PlayerInput _playerInput;
     public LayerMask groundLayer;
     public float playerHeight;
     public float moveSpeed = 1.0f;
     public float runSpeed = 3.0f;
     public float jumpForce = 5.0f;
     public float rotateSensitivity = 2.0f;
-    void OnEnable()
-    {
-        _playerRigid = GetComponent<Rigidbody>();
-        _playerModel = GetComponent<PlayerModel>();
-        _animator = GetComponent<Animator>();
-        _playerModel.inputHandler = GetComponent<InputHandler>();
-        _playerModel.inputHandler.OnWalkInput += Walk;
-        _playerModel.inputHandler.OnRunInput += Run;
-        _playerModel.inputHandler.OnJumpInput += Jump;
-        _playerModel.inputHandler.OnMouseInput += RotateBody;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-    }
 
     void Start()
     {
+        _playerRoot = GetComponent<PlayerRoot>();
+        _playerRigid = GetComponent<Rigidbody>();
+        _playerInput = GetComponent<PlayerInput>();
+        _animator = GetComponent<Animator>();
+        _playerInput = GetComponent<PlayerInput>();
+        if (_playerRoot.Model.isMine)
+        {
+            _playerInput.OnWalkInput += Walk;
+            _playerInput.OnRunInput += Run;
+            _playerInput.OnJumpInput += Jump;
+            _playerInput.OnMouseInput += RotateBody;
+            _playerInput.OnCrawlInput += Crawl;
+        }
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void Walk(Vector3 input)
     {
         if (input.sqrMagnitude < 0.1f)
         {
-            _animator.SetBool("isWalk", false);
-            _animator.SetBool("isRun", false);
+            _animator.SetFloat("moveSpeed", 0f);
             return;
         }
 
         Vector3 moveDirection = transform.rotation * input;
         Vector3 movement = moveDirection * moveSpeed;
         _playerRigid.MovePosition(_playerRigid.position + movement * Time.deltaTime);
-        _animator.SetBool("isWalk", true);
-        _animator.SetBool("isRun", false);
+        _animator.SetFloat("moveSpeed", 0.5f);
     }
 
     void Run(Vector3 input)
     {
         if (input.sqrMagnitude < 0.1f)
         {
-            _animator.SetBool("isRun", false);
-            _animator.SetBool("isWalk", false);
+            _animator.SetFloat("moveSpeed", 0f);
             return;
         }
 
         Vector3 moveDirection = transform.rotation * input;
         Vector3 movement = moveDirection * runSpeed;
         _playerRigid.MovePosition(_playerRigid.position + movement * Time.deltaTime);
-        _animator.SetBool("isWalk", false);
-        _animator.SetBool("isRun", true);
+        _animator.SetFloat("moveSpeed", 1f);
+    }
+
+    void Crawl()
+    {
+        _animator.SetBool("isCrawl", !_animator.GetBool("isCrawl"));
     }
 
     void RotateBody(Vector2 mouseInput)
