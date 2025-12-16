@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
+using Player.Model;
 
 namespace Network
 {
@@ -38,12 +39,13 @@ namespace Network
             return new Vector3(vec3.X, vec3.Y, vec3.Z);
         }
 
+        //TODO: GC최적화 해야함 -> class 동적 할당 부분
         protected PlayerModel ToPlayerModel(PlayerInfo playerInfo)
         {
             PlayerModel playerModel = new PlayerModel(playerInfo.PlayerID);
             playerModel.SetPlayerTransform(ToVector3(playerInfo.Position), ToVector3(playerInfo.Rotation));
-            playerModel.SetPlayerState(playerInfo.PlayerPostureState);
-            playerModel.SetPlayerState(playerInfo.PlayerMovementType);
+            playerModel.SetPostureState(playerInfo.PlayerPostureState);
+            playerModel.SetMovementType(playerInfo.PlayerMovementType);
             return playerModel;
         }
     }

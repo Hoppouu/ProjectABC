@@ -2,6 +2,7 @@ using Manager;
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
+using Player.Model;
 
 namespace Manager
 {
@@ -20,9 +21,7 @@ namespace Manager
 
         public void SetModel(PlayerModel playerModel)
         {
-            this.playerModel.SetPlayerTransform(playerModel.PlayerPosition, playerModel.PlayerRotation);
-            this.playerModel.SetPlayerState(playerModel.PlayerPostureState);
-            this.playerModel.SetPlayerState(playerModel.PlayerMovementType);
+            this.playerModel.SetPlayerInfo(playerModel.Data);
         }
     }
 }
@@ -52,10 +51,10 @@ public class GameManager : MonoBehaviour
 
     public void AddPlayer(PlayerModel playerModel, IPEndPoint ipEndPoint = null)
     {
-        _players[playerModel.PlayerID] = new PlayerEntry(CreatePlayerPrefab(), playerModel, ipEndPoint);
+        _players[playerModel.playerID] = new PlayerEntry(CreatePlayerPrefab(), playerModel, ipEndPoint);
         Vector3 initPosition = new Vector3(-4 + _next++ * 2, 1, 0);
         playerModel.SetPlayerTransform(initPosition, Vector3.zero);
-        _players[playerModel.PlayerID].gameObject.GetComponent<PlayerRoot>().Initiate(playerModel);
+        _players[playerModel.playerID].gameObject.GetComponent<PlayerRoot>().Initiate(playerModel);
     }
 
     public int GetNextPlayerID() { return _nextPlayerID++; }
@@ -68,8 +67,8 @@ public class GameManager : MonoBehaviour
 
     public bool SetPlayers(PlayerModel playerModel)
     {
-        if (!_players.ContainsKey(playerModel.PlayerID)) return false;
-        _players[playerModel.PlayerID].SetModel(playerModel);
+        if (!_players.ContainsKey(playerModel.playerID)) return false;
+        _players[playerModel.playerID].SetModel(playerModel);
         return true;
     }
 

@@ -1,50 +1,144 @@
-using UnityEngine;
 using Network;
-public class PlayerModel
+using System.Data;
+using System;
+using UnityEngine;
+namespace Player.Model
 {
-    public Vector3 PlayerPosition { get; private set; }
-    public Vector3 PlayerRotation { get; private set; }
-    public Vector3 HeadPosition { get; private set; }
-    public Vector3 HeadRotation { get; private set; }
-
-    public int PlayerID { get; private set; }
-    public bool IsMine { get; private set; }
-
-    public float moveSpeed { get; private set; }
-    public bool isCrawl { get; private set; }
-
-    public PlayerPostureState PlayerPostureState { get; private set; }
-    public PlayerMovementType PlayerMovementType { get; private set; }
-
-    public PlayerModel(int playerID)
+    public enum PlayerPostureState
     {
-        PlayerID = playerID;
+        Unknown = 0,
+        Stand = 1,
+        Crawl = 2,
     }
 
-    public PlayerModel(bool isMine)
+    public enum PlayerMovementType
     {
-        IsMine = isMine;
+        Unknown = 0,
+        Idle = 1,
+        Walk = 2,
+        Run = 3,
     }
 
-    public PlayerModel(int playerID, bool isMine)
+    public struct PlayerData
     {
-        PlayerID = playerID;
-        IsMine = isMine;
+        public Vector3 playerPosition;
+        public Vector3 playerRotation;
+        public Vector3 headPosition;
+        public Vector3 headRotation;
+
+        public PlayerPostureState playerPostureState;
+        public PlayerMovementType playerMovementType;
     }
 
-    public void SetPlayerTransform(Vector3 playerPosition, Vector3 playerRotation)
+    public class PlayerModel
     {
-        PlayerPosition = playerPosition;
-        PlayerRotation = playerRotation;
-    }
+        public readonly int playerID;
+        public readonly bool isMine;
+        public PlayerData Data => _data;
+        public float MoveSpeed { get; private set; }
+        public bool IsCrawl { get; private set; }
 
-    public void SetPlayerState(PlayerPostureState playerPostureState)
-    {
-        PlayerPostureState = playerPostureState;
-    }
+        private PlayerData _data;
 
-    public void SetPlayerState(PlayerMovementType playerMovementType)
-    {
-        PlayerMovementType = playerMovementType;
+        private PlayerModel()
+        {
+            _data = new PlayerData();
+            SetPostureState(PlayerPostureState.Stand);
+            SetMovementType(PlayerMovementType.Idle);
+        }
+
+        public PlayerModel(int playerID, bool isMine = false):base()
+        {
+            this.playerID = playerID;
+            this.isMine = isMine;
+        }
+
+        public void SetPlayerInfo(PlayerData data)
+        {
+            _data = data;
+            ApplyPostureState();
+            ApplyMovementType();
+        }
+
+        public void SetPlayerTransform(Vector3 playerPosition, Vector3 playerRotation)
+        {
+            _data.playerPosition = playerPosition;
+            _data.playerRotation = playerRotation;
+        }
+        public void SetPlayerPosition(Vector3 playerPosition)
+        {
+            _data.playerPosition = playerPosition;
+        }
+        public void SetPlayerRotation(Vector3 playerRotation)
+        {
+            _data.playerRotation = playerRotation;
+        }
+
+        public void SetPostureState(Network.PlayerPostureState state)
+        {
+            SetPostureState(MapNetworkToModel(state));
+        }
+
+        public void SetMovementType(Network.PlayerMovementType type)
+        {
+            SetMovementType(MapNetworkToModel(type));
+        }
+
+        public void SetPostureState(PlayerPostureState state)
+        {
+            _data.playerPostureState = state;
+            ApplyPostureState();
+        }
+
+        public void SetMovementType(PlayerMovementType type)
+        {
+            _data.playerMovementType = type;
+            ApplyMovementType();
+        }
+
+        private void ApplyPostureState()
+        {
+            switch (_data.playerPostureState)
+            {
+                case PlayerPostureState.Stand:
+                    IsCrawl = false; break;
+                case PlayerPostureState.Crawl:
+                    IsCrawl = true; break;
+            }
+        }
+
+        private void ApplyMovementType()
+        {
+            switch (_data.playerMovementType)
+            {
+                case PlayerMovementType.Idle:
+                    MoveSpeed = 0f; break;
+                case PlayerMovementType.Walk:
+                    MoveSpeed = 0.5f; break;
+                case PlayerMovementType.Run:
+                    MoveSpeed = 1f; break;
+            }
+        }
+
+        private PlayerPostureState MapNetworkToModel(Network.PlayerPostureState state)
+        {
+            return state switch
+            {
+                Network.PlayerPostureState.Stand => PlayerPostureState.Stand,
+                Network.PlayerPostureState.Crawl => PlayerPostureState.Crawl,
+                _ => PlayerPostureState.Stand
+            };
+        }
+
+        private PlayerMovementType MapNetworkToModel(Network.PlayerMovementType type)
+        {
+            return type switch
+            {
+                Network.PlayerMovementType.Idle => PlayerMovementType.Idle,
+                Network.PlayerMovementType.Walk => PlayerMovementType.Walk,
+                Network.PlayerMovementType.Run => PlayerMovementType.Run,
+                _ => PlayerMovementType.Idle
+            };
+        }
     }
 }

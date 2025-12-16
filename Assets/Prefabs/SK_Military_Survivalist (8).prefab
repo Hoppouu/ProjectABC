@@ -2243,14 +2243,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7ad5abb7d52f224487920e32f7d8bcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  groundLayer:
+  _groundLayer:
     serializedVersion: 2
-    m_Bits: 64
-  playerHeight: 0.5
-  moveSpeed: 1
-  runSpeed: 3
-  jumpForce: 4
-  rotateSensitivity: 2
+    m_Bits: 0
+  _playerHeight: 0
+  _runSpeed: 3
+  _jumpForce: 5
+  _rotateSensitivity: 2
 --- !u!114 &1084181798973345994
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2485,7 +2484,7 @@ Camera:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6536699881716219390}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
@@ -2536,7 +2535,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6536699881716219390}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!114 &7537247814004850279
 MonoBehaviour:
   m_ObjectHideFlags: 0

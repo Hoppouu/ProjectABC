@@ -18,18 +18,26 @@ public class CameraController : MonoBehaviour
 
     private void Start()
     {
-        if (_playerRoot.Model.IsMine)
+        if (_playerRoot.Model.isMine)
         {
+            GetComponent<Camera>().enabled = true;
+            GetComponent<AudioListener>().enabled = true;
             _playerInput.OnMouseInput += HandleLookInput;
         }
-        else if (!_playerRoot.Model.IsMine)
+        else if (!_playerRoot.Model.isMine)
         {
+            _playerRoot.OnPlayerInfoUpdate += () => _playerRoot.playerTransform.eulerAngles = _playerRoot.Model.Data.playerRotation;
             gameObject.SetActive(false);
         }
     }
     private void HandleLookInput(Vector2 input)
     {
         _inputDelta = input;
+    }
+
+    private void Update()
+    {
+
     }
 
     void LateUpdate()
@@ -55,6 +63,7 @@ public class CameraController : MonoBehaviour
 
             // ¸öÅë È¸Àü
             _playerRoot.playerTransform.Rotate(Vector3.up * mouseX);
+            _playerRoot.Model.SetPlayerRotation(_playerRoot.playerTransform.rotation.eulerAngles);
             _inputDelta = Vector2.zero;
         }
 

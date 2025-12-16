@@ -2,6 +2,7 @@
 using UnityEngine;
 using Manager;
 using System.Collections.Generic;
+using Player.Model;
 
 namespace Network
 {
@@ -21,11 +22,11 @@ namespace Network
         {
             Network.PlayerInfo playerInfo = new Network.PlayerInfo()
             {
-                PlayerID = playerModel.PlayerID,
-                Position = ToVec3(playerModel.PlayerPosition),
-                Rotation = ToVec3(playerModel.PlayerRotation),
-                PlayerPostureState = playerModel.PlayerPostureState,
-                PlayerMovementType = playerModel.PlayerMovementType,
+                PlayerID = playerModel.playerID,
+                Position = ToVec3(playerModel.Data.playerPosition),
+                Rotation = ToVec3(playerModel.Data.playerRotation),
+                PlayerPostureState = (PlayerPostureState)playerModel.Data.playerPostureState,
+                PlayerMovementType = (PlayerMovementType)playerModel.Data.playerMovementType,
             };
 
             return playerInfo;

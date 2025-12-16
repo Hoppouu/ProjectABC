@@ -1,5 +1,6 @@
 using UnityEngine;
-
+using Player.Model;
+using System;
 
 
 public class PlayerRoot : MonoBehaviour
@@ -7,23 +8,30 @@ public class PlayerRoot : MonoBehaviour
     public Transform playerTransform;
     public Transform headTransform;
 
+    public event Action OnPlayerInfoUpdate;
     public PlayerModel Model { get; private set; }
 
     private float _curTime = 0f;
-    private const float _INTERVR_TIME = 0.01f;
+    private const float _INTERVR_TIME = 1/60f;
 
     private void LateUpdate()
+    {
+        SendPlayerInfoPacket();
+    }
+
+    private void SendPlayerInfoPacket()
     {
         _curTime += Time.deltaTime;
         if (_curTime >= _INTERVR_TIME)
         {
-            if (Model.IsMine)
+            if (Model.isMine)
             {
-                Model.SetPlayerTransform(transform.position, transform.rotation.eulerAngles);
                 NetworkManager.Instance.ClientSender.SendPlayerInfo(Model);
             }
-
-            SetModel();
+            else
+            {
+                OnPlayerInfoUpdate?.Invoke();
+            }
             _curTime = 0f;
         }
     }
@@ -31,13 +39,7 @@ public class PlayerRoot : MonoBehaviour
     public void Initiate(PlayerModel playerModel)
     {
         Model = playerModel;
-        transform.position = playerModel.PlayerPosition;
-        transform.rotation = Quaternion.Euler(playerModel.PlayerRotation);
-    }
-
-    private void SetModel()
-    {
-        transform.position = Model.PlayerPosition;
-        transform.rotation = Quaternion.Euler(Model.PlayerRotation);
+        transform.position = playerModel.Data.playerPosition;
+        transform.rotation = Quaternion.Euler(playerModel.Data.playerRotation);
     }
 }

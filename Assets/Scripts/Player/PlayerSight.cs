@@ -17,7 +17,7 @@ public class PlayerSight : MonoBehaviour
         lookTarget = GetComponentInChildren<Camera>().transform;
         _playerRoot = GetComponent<PlayerRoot>();
         _playerInput = GetComponent<PlayerInput>();
-        if (!_playerRoot.Model.IsMine)
+        if (!_playerRoot.Model.isMine)
         {
             _skinnedMeshRenderer = GetComponentsInChildren<SkinnedMeshRenderer>();
             foreach (var renderer in _skinnedMeshRenderer)

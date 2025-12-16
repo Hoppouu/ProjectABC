@@ -1,20 +1,22 @@
 using UnityEngine;
-using Network;
+using Player.Model;
 
 public class PlayerController : MonoBehaviour
 {
+    #region 설정
+    [SerializeField] private LayerMask _groundLayer;
+    [SerializeField] private float _playerHeight;
+    [SerializeField] private float _runSpeed = 3.0f;
+    [SerializeField] private float _jumpForce = 5.0f;
+    [SerializeField] private float _rotateSensitivity = 2.0f;
+    #endregion
+
+    #region private 변수
     private PlayerRoot _playerRoot;
     private Rigidbody _playerRigid;
     private Animator _animator;
     private PlayerInput _playerInput;
-
-    private bool _isCrawl = false;
-    public LayerMask groundLayer;
-    public float playerHeight;
-    public float moveSpeed = 1.0f;
-    public float runSpeed = 3.0f;
-    public float jumpForce = 5.0f;
-    public float rotateSensitivity = 2.0f;
+    #endregion
 
     void Start()
     {
@@ -23,100 +25,85 @@ public class PlayerController : MonoBehaviour
         _playerInput = GetComponent<PlayerInput>();
         _animator = GetComponent<Animator>();
         _playerInput = GetComponent<PlayerInput>();
-        if (_playerRoot.Model.IsMine)
+        if (_playerRoot.Model.isMine)
         {
             _playerInput.OnWalkInput += Walk;
             _playerInput.OnRunInput += Run;
             _playerInput.OnJumpInput += Jump;
             _playerInput.OnMouseInput += RotateBody;
             _playerInput.OnCrawlInput += Crawl;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-    }
-
-    void Update()
-    {
-        TriggerAnimation();
-    }
-
-    void TriggerAnimation()
-    {
-        SetPlayerPostureState(_playerRoot.Model.PlayerPostureState);
-        SetPlayerMovementState(_playerRoot.Model.PlayerMovementType);
-        _animator.SetBool("isCrawl", _isCrawl);
-        _animator.SetFloat("moveSpeed", moveSpeed);
-    }
-
-    public void SetPlayerPostureState(PlayerPostureState postureState)
-    {
-        switch (postureState)
+        else
         {
-            case PlayerPostureState.Stand:
-                _isCrawl = false;   break;
-            case PlayerPostureState.Crawl:
-                _isCrawl = true;    break;
+            _playerRoot.OnPlayerInfoUpdate += () => ApplyModelDataToView();
         }
-        _playerRoot.Model.SetPlayerState(postureState);
-    }
 
-    public void SetPlayerMovementState(PlayerMovementType movementType)
+    }
+    private void Update()
     {
-        switch (movementType)
+        if (_playerRoot.Model.isMine)
         {
-            case PlayerMovementType.Idle:
-                moveSpeed = 0f;     break;
-            case PlayerMovementType.Walk:
-                moveSpeed = 0.5f;   break;
-            case PlayerMovementType.Run:
-                moveSpeed = 1f;     break;
+            _playerRoot.Model.SetPlayerPosition(transform.position);
         }
-        _playerRoot.Model.SetPlayerState(movementType);
+    }
+    private void ApplyModelDataToView()
+    {
+        _animator.SetBool("isCrawl", _playerRoot.Model.IsCrawl);
+        _animator.SetFloat("moveSpeed", _playerRoot.Model.MoveSpeed);
+        transform.position = _playerRoot.Model.Data.playerPosition;
+        transform.rotation = Quaternion.Euler(_playerRoot.Model.Data.playerRotation);
     }
 
     void Walk(Vector3 input)
     {
         if (input.sqrMagnitude < 0.1f)
         {
-            SetPlayerMovementState(PlayerMovementType.Idle);
+            _playerRoot.Model.SetMovementType(PlayerMovementType.Idle);
+            _animator.SetFloat("moveSpeed", _playerRoot.Model.MoveSpeed);
             return;
         }
 
         Vector3 moveDirection = transform.rotation * input;
-        Vector3 movement = moveDirection * moveSpeed;
+        Vector3 movement = moveDirection * _playerRoot.Model.MoveSpeed;
         _playerRigid.MovePosition(_playerRigid.position + movement * Time.deltaTime);
-        SetPlayerMovementState(PlayerMovementType.Walk);
+        _playerRoot.Model.SetMovementType(PlayerMovementType.Walk);
+        _animator.SetFloat("moveSpeed", _playerRoot.Model.MoveSpeed);
     }
 
     void Run(Vector3 input)
     {
         if (input.sqrMagnitude < 0.1f)
         {
-            SetPlayerMovementState(PlayerMovementType.Idle);
+            _playerRoot.Model.SetMovementType(PlayerMovementType.Idle);
+            _animator.SetFloat("moveSpeed", _playerRoot.Model.MoveSpeed);
             return;
         }
 
         Vector3 moveDirection = transform.rotation * input;
-        Vector3 movement = moveDirection * runSpeed;
+        Vector3 movement = moveDirection * _runSpeed;
         _playerRigid.MovePosition(_playerRigid.position + movement * Time.deltaTime);
-        SetPlayerMovementState(PlayerMovementType.Run);
+        _playerRoot.Model.SetMovementType(PlayerMovementType.Run);
+        _animator.SetFloat("moveSpeed", _playerRoot.Model.MoveSpeed);
     }
 
     void Crawl()
     {
         if (_animator.GetBool("isCrawl"))
         {
-            SetPlayerPostureState(PlayerPostureState.Stand);
+            _playerRoot.Model.SetPostureState(PlayerPostureState.Stand);
         }
         else
         {
-            SetPlayerPostureState(PlayerPostureState.Crawl);
+            _playerRoot.Model.SetPostureState(PlayerPostureState.Crawl);
         }
+        _animator.SetBool("isCrawl", _playerRoot.Model.IsCrawl);
     }
 
     void RotateBody(Vector2 mouseInput)
     {
-        float yRotation = mouseInput.x * rotateSensitivity;
+        float yRotation = mouseInput.x * _rotateSensitivity;
         transform.Rotate(Vector3.up * yRotation);
     }
 
@@ -124,11 +111,11 @@ public class PlayerController : MonoBehaviour
     {
         if (IsGrounded())
         {
-            _playerRigid.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            _playerRigid.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
         }
     }
     private bool IsGrounded()
     {
-        return Physics.Raycast(transform.position, Vector3.down, playerHeight, groundLayer);
+        return Physics.Raycast(transform.position, Vector3.down, _playerHeight, _groundLayer);
     }
 }

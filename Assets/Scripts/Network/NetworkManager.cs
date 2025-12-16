@@ -1,6 +1,6 @@
-using System.Net;
 using UnityEngine;
 using Network;
+using Player.Model;
 
 public class NetworkManager : MonoBehaviour
 {
